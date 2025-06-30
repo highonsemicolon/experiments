@@ -1,0 +1,35 @@
+architecture: replicaset
+replicaCount: 3
+
+auth:
+  enabled: true
+  rootUser: admin
+  rootPassword: admin  # 🔒 change to a secure value
+  usernames:
+    - appuser
+  passwords:
+    - appuserPassword123  # 🔒 change to a secure value
+  databases:
+    - appdb
+
+persistence:
+  enabled: true
+  storageClass: standard   # Change if using a different cloud provider (e.g., gp2, premium, etc.)
+  size: 80Gi               # Enough for 50M+ records with index and delete history
+
+resources:
+  requests:
+    memory: 1Gi
+    cpu: 500m
+  limits:
+    memory: 2Gi
+    cpu: 1000m
+
+arbiter:
+  enabled: false
+
+metrics:
+  enabled: true
+
+tls:
+  enabled: false  # Enable and configure for production
