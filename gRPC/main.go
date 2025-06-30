@@ -10,8 +10,7 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	 "google.golang.org/grpc/reflection"
-
+	"google.golang.org/grpc/reflection"
 )
 
 type greeterServer struct {
@@ -23,7 +22,7 @@ func (s *greeterServer) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -37,7 +36,7 @@ func main() {
 
 	reflection.Register(s)
 
-	log.Println("Server is running on :50051")
+	log.Println("Server is running on :8080")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
