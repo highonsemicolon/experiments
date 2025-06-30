@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package record;
+
+service RecordService {
+  rpc InsertRecords (InsertRequest) returns (InsertResponse);
+  rpc DeleteRecords (DeleteRequest) returns (DeleteResponse);
+}
+
+message Record {
+  string col1 = 1;
+  string col2 = 2;
+}
+
+message InsertRequest {
+  repeated Record records = 1;
+}
+
+message InsertResponse {
+  string message = 1;
+  bool success = 2;
+}
+
+message DeleteRequest {
+  repeated Record records = 1;
+  string deleted_by = 2;
+}
+
+message DeleteResponse {
+  string message = 1;
+  bool success = 2;
+}
