@@ -18,7 +18,20 @@ const (
 	batchSize      = 1_000
 )
 
+func createUniqueIndexes(ctx context.Context, collection *mongo.Collection) error {
+	indexModel1 := mongo.IndexModel{
+		Keys:    map[string]interface{}{"col1": 1},
+		Options: options.Index().SetUnique(true).SetName("unique_col1"),
+	}
 
+	indexModel2 := mongo.IndexModel{
+		Keys:    map[string]interface{}{"col2": 1},
+		Options: options.Index().SetUnique(true).SetName("unique_col2"),
+	}
+
+	_, err := collection.Indexes().CreateMany(ctx, []mongo.IndexModel{indexModel1, indexModel2})
+	return err
+}
 
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
@@ -32,6 +45,12 @@ func main() {
 	defer client.Disconnect(ctx)
 
 	collection := client.Database(dbName).Collection(collectionName)
+
+	err = createUniqueIndexes(ctx, collection)
+	if err != nil {
+		log.Fatalf("Failed to create indexes: %v", err)
+	}
+	fmt.Println("Unique indexes created (if not already present).")
 
 	fmt.Printf("Inserting %d records in batches of %d...\n", totalRecords, batchSize)
 
