@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/schollz/progressbar/v3"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
@@ -57,6 +58,17 @@ func loadDataInParallel(ctx context.Context, collection *mongo.Collection) {
 	var wg sync.WaitGroup
 	wg.Add(workers)
 
+	bar := progressbar.NewOptions(totalRecords,
+		progressbar.OptionSetDescription("Inserting"),
+		progressbar.OptionShowCount(),
+		progressbar.OptionSetWidth(40),
+		progressbar.OptionThrottle(65*time.Millisecond),
+		progressbar.OptionShowBytes(true),
+		progressbar.OptionClearOnFinish(),
+	)
+
+	var barLock sync.Mutex
+
 	for range workers {
 		go func() {
 			defer wg.Done()
@@ -65,6 +77,9 @@ func loadDataInParallel(ctx context.Context, collection *mongo.Collection) {
 				if err != nil {
 					log.Fatalf("Insert failed: %v", err)
 				}
+				barLock.Lock()
+				_ = bar.Add(len(batch))
+				barLock.Unlock()
 			}
 		}()
 	}
@@ -73,9 +88,6 @@ func loadDataInParallel(ctx context.Context, collection *mongo.Collection) {
 	for i := 0; i < totalRecords; i += batchSize {
 		size := min(totalRecords-i, batchSize)
 		jobChan <- makeBatch(i, size)
-		if (i+batchSize)%100_000 == 0 {
-			fmt.Printf("Queued %d records...\n", i+batchSize)
-		}
 	}
 
 	close(jobChan)
