@@ -19,16 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	RecordService_InsertRecords_FullMethodName = "/record.RecordService/InsertRecords"
-	RecordService_DeleteRecords_FullMethodName = "/record.RecordService/DeleteRecords"
+	RecordService_UpsertRecords_FullMethodName = "/record.RecordService/UpsertRecords"
 )
 
 // RecordServiceClient is the client API for RecordService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RecordServiceClient interface {
-	InsertRecords(ctx context.Context, in *InsertRequest, opts ...grpc.CallOption) (*InsertResponse, error)
-	DeleteRecords(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	UpsertRecords(ctx context.Context, in *UpsertRequest, opts ...grpc.CallOption) (*UpsertResponse, error)
 }
 
 type recordServiceClient struct {
@@ -39,20 +37,10 @@ func NewRecordServiceClient(cc grpc.ClientConnInterface) RecordServiceClient {
 	return &recordServiceClient{cc}
 }
 
-func (c *recordServiceClient) InsertRecords(ctx context.Context, in *InsertRequest, opts ...grpc.CallOption) (*InsertResponse, error) {
+func (c *recordServiceClient) UpsertRecords(ctx context.Context, in *UpsertRequest, opts ...grpc.CallOption) (*UpsertResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(InsertResponse)
-	err := c.cc.Invoke(ctx, RecordService_InsertRecords_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *recordServiceClient) DeleteRecords(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, RecordService_DeleteRecords_FullMethodName, in, out, cOpts...)
+	out := new(UpsertResponse)
+	err := c.cc.Invoke(ctx, RecordService_UpsertRecords_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +51,7 @@ func (c *recordServiceClient) DeleteRecords(ctx context.Context, in *DeleteReque
 // All implementations must embed UnimplementedRecordServiceServer
 // for forward compatibility.
 type RecordServiceServer interface {
-	InsertRecords(context.Context, *InsertRequest) (*InsertResponse, error)
-	DeleteRecords(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	UpsertRecords(context.Context, *UpsertRequest) (*UpsertResponse, error)
 	mustEmbedUnimplementedRecordServiceServer()
 }
 
@@ -75,11 +62,8 @@ type RecordServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedRecordServiceServer struct{}
 
-func (UnimplementedRecordServiceServer) InsertRecords(context.Context, *InsertRequest) (*InsertResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method InsertRecords not implemented")
-}
-func (UnimplementedRecordServiceServer) DeleteRecords(context.Context, *DeleteRequest) (*DeleteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteRecords not implemented")
+func (UnimplementedRecordServiceServer) UpsertRecords(context.Context, *UpsertRequest) (*UpsertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertRecords not implemented")
 }
 func (UnimplementedRecordServiceServer) mustEmbedUnimplementedRecordServiceServer() {}
 func (UnimplementedRecordServiceServer) testEmbeddedByValue()                       {}
@@ -102,38 +86,20 @@ func RegisterRecordServiceServer(s grpc.ServiceRegistrar, srv RecordServiceServe
 	s.RegisterService(&RecordService_ServiceDesc, srv)
 }
 
-func _RecordService_InsertRecords_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InsertRequest)
+func _RecordService_UpsertRecords_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RecordServiceServer).InsertRecords(ctx, in)
+		return srv.(RecordServiceServer).UpsertRecords(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: RecordService_InsertRecords_FullMethodName,
+		FullMethod: RecordService_UpsertRecords_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RecordServiceServer).InsertRecords(ctx, req.(*InsertRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _RecordService_DeleteRecords_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RecordServiceServer).DeleteRecords(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RecordService_DeleteRecords_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RecordServiceServer).DeleteRecords(ctx, req.(*DeleteRequest))
+		return srv.(RecordServiceServer).UpsertRecords(ctx, req.(*UpsertRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -146,12 +112,8 @@ var RecordService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*RecordServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "InsertRecords",
-			Handler:    _RecordService_InsertRecords_Handler,
-		},
-		{
-			MethodName: "DeleteRecords",
-			Handler:    _RecordService_DeleteRecords_Handler,
+			MethodName: "UpsertRecords",
+			Handler:    _RecordService_UpsertRecords_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
