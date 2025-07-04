@@ -12,7 +12,8 @@ message Record {
 }
 
 message UpsertRequest {
-  repeated Record records = 1;
+  string orderID = 1;
+  repeated Record records = 2;
 }
 
 message UpsertResponse {
