@@ -73,27 +73,28 @@ func (x *Record) GetCol2() string {
 	return ""
 }
 
-type InsertRequest struct {
+type UpsertRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Records       []*Record              `protobuf:"bytes,1,rep,name=records,proto3" json:"records,omitempty"`
+	OrderID       string                 `protobuf:"bytes,1,opt,name=orderID,proto3" json:"orderID,omitempty"`
+	Records       []*Record              `protobuf:"bytes,2,rep,name=records,proto3" json:"records,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InsertRequest) Reset() {
-	*x = InsertRequest{}
+func (x *UpsertRequest) Reset() {
+	*x = UpsertRequest{}
 	mi := &file_proto_record_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *InsertRequest) String() string {
+func (x *UpsertRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*InsertRequest) ProtoMessage() {}
+func (*UpsertRequest) ProtoMessage() {}
 
-func (x *InsertRequest) ProtoReflect() protoreflect.Message {
+func (x *UpsertRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_record_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -105,19 +106,26 @@ func (x *InsertRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InsertRequest.ProtoReflect.Descriptor instead.
-func (*InsertRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpsertRequest.ProtoReflect.Descriptor instead.
+func (*UpsertRequest) Descriptor() ([]byte, []int) {
 	return file_proto_record_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *InsertRequest) GetRecords() []*Record {
+func (x *UpsertRequest) GetOrderID() string {
+	if x != nil {
+		return x.OrderID
+	}
+	return ""
+}
+
+func (x *UpsertRequest) GetRecords() []*Record {
 	if x != nil {
 		return x.Records
 	}
 	return nil
 }
 
-type InsertResponse struct {
+type UpsertResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
@@ -125,20 +133,20 @@ type InsertResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InsertResponse) Reset() {
-	*x = InsertResponse{}
+func (x *UpsertResponse) Reset() {
+	*x = UpsertResponse{}
 	mi := &file_proto_record_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *InsertResponse) String() string {
+func (x *UpsertResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*InsertResponse) ProtoMessage() {}
+func (*UpsertResponse) ProtoMessage() {}
 
-func (x *InsertResponse) ProtoReflect() protoreflect.Message {
+func (x *UpsertResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_record_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -150,123 +158,19 @@ func (x *InsertResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InsertResponse.ProtoReflect.Descriptor instead.
-func (*InsertResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpsertResponse.ProtoReflect.Descriptor instead.
+func (*UpsertResponse) Descriptor() ([]byte, []int) {
 	return file_proto_record_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *InsertResponse) GetMessage() string {
+func (x *UpsertResponse) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-func (x *InsertResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-type DeleteRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Records       []*Record              `protobuf:"bytes,1,rep,name=records,proto3" json:"records,omitempty"`
-	DeletedBy     string                 `protobuf:"bytes,2,opt,name=deleted_by,json=deletedBy,proto3" json:"deleted_by,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteRequest) Reset() {
-	*x = DeleteRequest{}
-	mi := &file_proto_record_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteRequest) ProtoMessage() {}
-
-func (x *DeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_record_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteRequest.ProtoReflect.Descriptor instead.
-func (*DeleteRequest) Descriptor() ([]byte, []int) {
-	return file_proto_record_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *DeleteRequest) GetRecords() []*Record {
-	if x != nil {
-		return x.Records
-	}
-	return nil
-}
-
-func (x *DeleteRequest) GetDeletedBy() string {
-	if x != nil {
-		return x.DeletedBy
-	}
-	return ""
-}
-
-type DeleteResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteResponse) Reset() {
-	*x = DeleteResponse{}
-	mi := &file_proto_record_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteResponse) ProtoMessage() {}
-
-func (x *DeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_record_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteResponse.ProtoReflect.Descriptor instead.
-func (*DeleteResponse) Descriptor() ([]byte, []int) {
-	return file_proto_record_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *DeleteResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-func (x *DeleteResponse) GetSuccess() bool {
+func (x *UpsertResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
@@ -280,22 +184,15 @@ const file_proto_record_proto_rawDesc = "" +
 	"\x12proto/record.proto\x12\x06record\"0\n" +
 	"\x06Record\x12\x12\n" +
 	"\x04col1\x18\x01 \x01(\tR\x04col1\x12\x12\n" +
-	"\x04col2\x18\x02 \x01(\tR\x04col2\"9\n" +
-	"\rInsertRequest\x12(\n" +
-	"\arecords\x18\x01 \x03(\v2\x0e.record.RecordR\arecords\"D\n" +
-	"\x0eInsertResponse\x12\x18\n" +
+	"\x04col2\x18\x02 \x01(\tR\x04col2\"S\n" +
+	"\rUpsertRequest\x12\x18\n" +
+	"\aorderID\x18\x01 \x01(\tR\aorderID\x12(\n" +
+	"\arecords\x18\x02 \x03(\v2\x0e.record.RecordR\arecords\"D\n" +
+	"\x0eUpsertResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess\"X\n" +
-	"\rDeleteRequest\x12(\n" +
-	"\arecords\x18\x01 \x03(\v2\x0e.record.RecordR\arecords\x12\x1d\n" +
-	"\n" +
-	"deleted_by\x18\x02 \x01(\tR\tdeletedBy\"D\n" +
-	"\x0eDeleteResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess2\x8f\x01\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess2O\n" +
 	"\rRecordService\x12>\n" +
-	"\rInsertRecords\x12\x15.record.InsertRequest\x1a\x16.record.InsertResponse\x12>\n" +
-	"\rDeleteRecords\x12\x15.record.DeleteRequest\x1a\x16.record.DeleteResponseb\x06proto3"
+	"\rUpsertRecords\x12\x15.record.UpsertRequest\x1a\x16.record.UpsertResponseb\x06proto3"
 
 var (
 	file_proto_record_proto_rawDescOnce sync.Once
@@ -309,26 +206,21 @@ func file_proto_record_proto_rawDescGZIP() []byte {
 	return file_proto_record_proto_rawDescData
 }
 
-var file_proto_record_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_proto_record_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_record_proto_goTypes = []any{
 	(*Record)(nil),         // 0: record.Record
-	(*InsertRequest)(nil),  // 1: record.InsertRequest
-	(*InsertResponse)(nil), // 2: record.InsertResponse
-	(*DeleteRequest)(nil),  // 3: record.DeleteRequest
-	(*DeleteResponse)(nil), // 4: record.DeleteResponse
+	(*UpsertRequest)(nil),  // 1: record.UpsertRequest
+	(*UpsertResponse)(nil), // 2: record.UpsertResponse
 }
 var file_proto_record_proto_depIdxs = []int32{
-	0, // 0: record.InsertRequest.records:type_name -> record.Record
-	0, // 1: record.DeleteRequest.records:type_name -> record.Record
-	1, // 2: record.RecordService.InsertRecords:input_type -> record.InsertRequest
-	3, // 3: record.RecordService.DeleteRecords:input_type -> record.DeleteRequest
-	2, // 4: record.RecordService.InsertRecords:output_type -> record.InsertResponse
-	4, // 5: record.RecordService.DeleteRecords:output_type -> record.DeleteResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	0, // 0: record.UpsertRequest.records:type_name -> record.Record
+	1, // 1: record.RecordService.UpsertRecords:input_type -> record.UpsertRequest
+	2, // 2: record.RecordService.UpsertRecords:output_type -> record.UpsertResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_record_proto_init() }
@@ -342,7 +234,7 @@ func file_proto_record_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_record_proto_rawDesc), len(file_proto_record_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
