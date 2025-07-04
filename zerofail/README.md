@@ -24,7 +24,7 @@ kubectl run grpc-client --rm -it --image=tarrunkhosla/grpcio:v1 --restart=Never
 
 '''
 kubectl cp ./tests default/grpc-client:/go
-grpcurl -plaintext -d @ 10.244.0.25:8080 record.RecordService/InsertRecords < tests/insert.json
+grpcurl -plaintext -d @ 10.244.0.25:8080 record.RecordService/UpsertRecords < tests/insert.json
 '''
 
 ## Mongosh in k8s
