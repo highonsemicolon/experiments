@@ -127,8 +127,8 @@ func (x *UpsertRequest) GetRecords() []*Record {
 
 type UpsertResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -163,18 +163,18 @@ func (*UpsertResponse) Descriptor() ([]byte, []int) {
 	return file_proto_record_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UpsertResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
 func (x *UpsertResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
+}
+
+func (x *UpsertResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 var File_proto_record_proto protoreflect.FileDescriptor
@@ -189,8 +189,8 @@ const file_proto_record_proto_rawDesc = "" +
 	"\aorderID\x18\x01 \x01(\tR\aorderID\x12(\n" +
 	"\arecords\x18\x02 \x03(\v2\x0e.record.RecordR\arecords\"D\n" +
 	"\x0eUpsertResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess2O\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2O\n" +
 	"\rRecordService\x12>\n" +
 	"\rUpsertRecords\x12\x15.record.UpsertRequest\x1a\x16.record.UpsertResponseb\x06proto3"
 
