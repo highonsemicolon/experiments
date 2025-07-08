@@ -17,6 +17,6 @@ message UpsertRequest {
 }
 
 message UpsertResponse {
-  string message = 1;
-  bool success = 2;
+  bool success = 1;
+  string message = 2;
 }
