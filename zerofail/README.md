@@ -35,3 +35,8 @@ kubectl run mongo-client --rm -it --image=mongo --restart=Never -- bash
 '''
 mongosh mongodb://admin:admin@my-mongo-mongodb-headless.mongodb.svc.cluster.local:27017/?authSource=admin
 '''
+
+
+'''
+time grpcurl -plaintext -d @ localhost:8080 record.RecordService/UpsertRecords < tests/insert.json
+'''
