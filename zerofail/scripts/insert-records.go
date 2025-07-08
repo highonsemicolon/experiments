@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
@@ -24,12 +25,12 @@ const (
 
 func createUniqueIndexes(ctx context.Context, collection *mongo.Collection) error {
 	indexModel1 := mongo.IndexModel{
-		Keys:    map[string]any{"col1": 1},
+		Keys:    map[string]any{"pairs.col1": 1},
 		Options: options.Index().SetUnique(true).SetName("unique_col1"),
 	}
 
 	indexModel2 := mongo.IndexModel{
-		Keys:    map[string]any{"col2": 1},
+		Keys:    map[string]any{"pairs.col2": 1},
 		Options: options.Index().SetUnique(true).SetName("unique_col2"),
 	}
 
@@ -38,21 +39,27 @@ func createUniqueIndexes(ctx context.Context, collection *mongo.Collection) erro
 }
 
 func makeBatch(start, size int) []any {
-	batch := make([]any, 0, size)
+	batch := make([]any, size)
 	now := time.Now()
-	counter := start * batchSize
-	for i := range size {
-		for j := range uniquePairs {
-			document := map[string]any{
-				"_id":       fmt.Sprintf("%d_%02d", start+i, j),
-				"col1":      fmt.Sprintf("col1_%d", counter),
-				"col2":      fmt.Sprintf("col2_%d", counter),
-				"createdAt": now,
+	counter := start * uniquePairs
+
+	for i := 0; i < size; i++ {
+		pairs := make([]bson.D, uniquePairs)
+		for j := 0; j < uniquePairs; j++ {
+			pairs[j] = bson.D{
+				{Key: "col1", Value: fmt.Sprintf("col1_%02d", counter)},
+				{Key: "col2", Value: fmt.Sprintf("col2_%02d", counter)},
 			}
-			batch = append(batch, document)
 			counter++
 		}
+
+		batch[i] = map[string]any{
+			"_id":       fmt.Sprintf("%d", start+i),
+			"pairs":     pairs,
+			"createdAt": now,
+		}
 	}
+
 	return batch
 }
 
@@ -105,14 +112,14 @@ func main() {
 	collection := client.Database(dbName).Collection(collectionName)
 	// collection.Drop(ctx)
 
-	fmt.Println("Starting bulk data load...")
-	loadDataInParallel(ctx, collection)
-
 	fmt.Println("Creating unique indexes...")
 	err = createUniqueIndexes(ctx, collection)
 	if err != nil {
 		log.Fatalf("Failed to create indexes: %v", err)
 	}
+
+	fmt.Println("Starting bulk data load...")
+	loadDataInParallel(ctx, collection)
 
 	fmt.Println("Done.")
 }
