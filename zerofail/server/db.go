@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -28,7 +29,14 @@ func InitMongoDB(uri string, dbName string) {
 	DeletedCollection = db.Collection("deleted_records")
 
 	_, _ = RecordCollection.Indexes().CreateMany(ctx, []mongo.IndexModel{
-		{Keys: map[string]any{"col1": 1}, Options: options.Index().SetUnique(true)},
-		{Keys: map[string]any{"col2": 1}, Options: options.Index().SetUnique(true)},
+		{
+			Keys:    bson.D{{Key: "col1", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
+		{
+			Keys:    bson.D{{Key: "col2", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
 	})
+
 }
