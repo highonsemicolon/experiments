@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	proto "github.com/highonsemicolon/experiments/zerofail/proto"
@@ -31,35 +30,31 @@ func (s *RecordServiceServer) UpsertRecords(ctx context.Context, req *proto.Upse
 		col2Set[r.Col2] = true
 	}
 
+	pairs := make([]bson.D, 0)
+	for _, r := range req.Records {
+		pair := bson.D{
+			{Key: "col1", Value: r.Col1},
+			{Key: "col2", Value: r.Col2},
+		}
+		pairs = append(pairs, pair)
+	}
+
 	now := time.Now()
 	var models []mongo.WriteModel
-	var idsToCleanup []string
 
-	for i, r := range req.Records {
-		docID := fmt.Sprintf("%s_%02d", req.OrderID, i)
-		idsToCleanup = append(idsToCleanup, docID)
+	upsert := mongo.NewReplaceOneModel().
+		SetFilter(bson.M{"_id": req.OrderID}).
+		SetReplacement(bson.M{
+			"pairs":     pairs,
+			"createdAt": now,
+		}).
+		SetUpsert(true)
 
-		upsert := mongo.NewReplaceOneModel().
-			SetFilter(bson.M{"_id": docID}).
-			SetReplacement(bson.M{
-				"_id":       docID,
-				"col1":      r.Col1,
-				"col2":      r.Col2,
-				"createdAt": now,
-			}).
-			SetUpsert(true)
-
-		models = append(models, upsert)
-	}
+	models = append(models, upsert)
 
 	opts := options.BulkWrite().SetOrdered(false)
 	_, err := RecordCollection.BulkWrite(ctx, models, opts)
 	if err != nil {
-		// on any failure, rollback all
-		_, _ = RecordCollection.DeleteMany(ctx, bson.M{
-			"_id": bson.M{"$in": idsToCleanup},
-		})
-
 		return &proto.UpsertResponse{
 			Success: false,
 			Message: "Upsert failed: " + err.Error(),
