@@ -6,7 +6,6 @@ import (
 
 	proto "github.com/highonsemicolon/experiments/zerofail/proto"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -30,30 +29,22 @@ func (s *RecordServiceServer) UpsertRecords(ctx context.Context, req *proto.Upse
 		col2Set[r.Col2] = true
 	}
 
-	pairs := make([]bson.D, 0)
-	for _, r := range req.Records {
-		pair := bson.D{
+	pairs := make([]bson.D, len(req.Records))
+	for i, r := range req.Records {
+		pairs[i] = bson.D{
 			{Key: "col1", Value: r.Col1},
 			{Key: "col2", Value: r.Col2},
 		}
-		pairs = append(pairs, pair)
 	}
 
-	now := time.Now()
-	var models []mongo.WriteModel
+	replacement := bson.M{
+		"pairs":     pairs,
+		"createdAt": time.Now(),
+	}
 
-	upsert := mongo.NewReplaceOneModel().
-		SetFilter(bson.M{"_id": req.OrderID}).
-		SetReplacement(bson.M{
-			"pairs":     pairs,
-			"createdAt": now,
-		}).
-		SetUpsert(true)
-
-	models = append(models, upsert)
-
-	opts := options.BulkWrite().SetOrdered(false)
-	_, err := RecordCollection.BulkWrite(ctx, models, opts)
+	filter := bson.M{"_id": req.OrderID}
+	opts := options.Replace().SetUpsert(true)
+	_, err := RecordCollection.ReplaceOne(ctx, filter, replacement, opts)
 	if err != nil {
 		return &proto.UpsertResponse{
 			Success: false,
