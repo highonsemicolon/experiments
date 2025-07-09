@@ -15,18 +15,11 @@ type RecordServiceServer struct {
 
 func (s *RecordServiceServer) UpsertRecords(ctx context.Context, req *proto.UpsertRequest) (*proto.UpsertResponse, error) {
 
-	// input validation
-	col1Set := make(map[string]bool)
-	col2Set := make(map[string]bool)
-	for _, r := range req.Records {
-		if col1Set[r.Col1] || col2Set[r.Col2] {
-			return &proto.UpsertResponse{
-				Message: "Duplicate col1 or col2 in request itself",
-				Success: false,
-			}, nil
-		}
-		col1Set[r.Col1] = true
-		col2Set[r.Col2] = true
+	if dup, msg := hasDuplicateCols(req.Records); dup {
+		return &proto.UpsertResponse{
+			Message: msg,
+			Success: false,
+		}, nil
 	}
 
 	pairs := make([]bson.D, len(req.Records))
@@ -56,4 +49,21 @@ func (s *RecordServiceServer) UpsertRecords(ctx context.Context, req *proto.Upse
 		Success: true,
 		Message: "Upsert successful",
 	}, nil
+}
+
+func hasDuplicateCols(records []*proto.Record) (bool, string) {
+	col1Set := make(map[string]bool)
+	col2Set := make(map[string]bool)
+
+	for _, r := range records {
+		if col1Set[r.Col1] {
+			return true, "Duplicate col1 in request"
+		}
+		if col2Set[r.Col2] {
+			return true, "Duplicate col2 in request"
+		}
+		col1Set[r.Col1] = true
+		col2Set[r.Col2] = true
+	}
+	return false, ""
 }
