@@ -30,11 +30,11 @@ func InitMongoDB(uri string, dbName string) {
 
 	_, _ = RecordCollection.Indexes().CreateMany(ctx, []mongo.IndexModel{
 		{
-			Keys:    bson.D{{Key: "col1", Value: 1}},
+			Keys:    bson.D{{Key: "pairs.col1", Value: 1}},
 			Options: options.Index().SetUnique(true),
 		},
 		{
-			Keys:    bson.D{{Key: "col2", Value: 1}},
+			Keys:    bson.D{{Key: "pairs.col2", Value: 1}},
 			Options: options.Index().SetUnique(true),
 		},
 	})
