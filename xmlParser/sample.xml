@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Person>
+  <Name>John</Name>
+  <Address>
+    <Street>123 Main St</Street>
+    <City>Springfield</City>
+  </Address>
+  <Address>
+    <Street>456 Elm St</Street>
+    <City>Shelbyville</City>
+  </Address>
+   <Address>
+    <Road>789 Oak St</Road>
+    <City>Nashville</City>
+  </Address>
+ 
+
+</Person>
