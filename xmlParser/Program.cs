@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Xml.Serialization;
 
-var options = new JsonSerializerOptions { WriteIndented = true };
+var options = new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
 // string xmlPath = "sample.xml";
 
@@ -23,7 +23,10 @@ using var reader = new StreamReader(xmlPath);
 var schedule = (ProductionSchedule)serializer.Deserialize(reader)!;
 
 // Convert the object to JSON using System.Text.Json
-var json = JsonSerializer.Serialize(schedule, options);
+// var json = JsonSerializer.Serialize(schedule, options);
+
+var map = Mapper.Map(schedule);
+var json = JsonSerializer.Serialize(map, options);
 
 Console.WriteLine(json);
 
