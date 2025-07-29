@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProductionSchedule xmlns="http://www.wbf.org/xml/B2MML-V0600">
+  <ID>Schedule001</ID>
+  <Description>Week 30 Production Schedule</Description>
+  <PublishedDate>2025-07-21T00:00:00Z</PublishedDate>
+  <ProductionRequest>
+    <ID>Request001</ID>
+    <Description>Batch of Product A</Description>
+    <RequestedStartTime>2025-07-22T08:00:00Z</RequestedStartTime>
+    <RequestedEndTime>2025-07-22T16:00:00Z</RequestedEndTime>
+    <ProductProductionRuleID>ProductA-Rule001</ProductProductionRuleID>
+    <Quantity>
+      <QuantityString>1000</QuantityString>
+      <DataType>Double</DataType>
+      <UnitOfMeasure>kg</UnitOfMeasure>
+    </Quantity>
+  </ProductionRequest>
+</ProductionSchedule>
