@@ -1,0 +1,23 @@
+[
+  {
+    "File": "../tmp/UserController.cs",
+    "Controller": "UsersController",
+    "Method": "GetUser",
+    "HttpMethod": "GET",
+    "Route": "api/[controller]/{id}"
+  },
+  {
+    "File": "../tmp/UserController.cs",
+    "Controller": "UsersController",
+    "Method": "CreateUser",
+    "HttpMethod": "POST",
+    "Route": "api/[controller]"
+  },
+  {
+    "File": "../tmp/UserController.cs",
+    "Controller": "UsersController",
+    "Method": "DeleteUser",
+    "HttpMethod": "DELETE",
+    "Route": "api/[controller]/{id}"
+  }
+]
