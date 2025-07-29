@@ -1,47 +1,47 @@
 [
   {
-    "File": "../tmp/UserController.cs",
-    "Type": "Controller",
-    "Controller": "UsersController",
-    "Method": "GetUser",
-    "HttpMethod": "GET",
-    "Route": "api/[controller]/{id}"
+    "file": "../tmp/UserController.cs",
+    "type": "Controller",
+    "controller": "UsersController",
+    "method": "GetUser",
+    "http_method": "GET",
+    "route": "api/[controller]/{id}"
   },
   {
-    "File": "../tmp/UserController.cs",
-    "Type": "Controller",
-    "Controller": "UsersController",
-    "Method": "CreateUser",
-    "HttpMethod": "POST",
-    "Route": "api/[controller]"
+    "file": "../tmp/UserController.cs",
+    "type": "Controller",
+    "controller": "UsersController",
+    "method": "CreateUser",
+    "http_method": "POST",
+    "route": "api/[controller]"
   },
   {
-    "File": "../tmp/UserController.cs",
-    "Type": "Controller",
-    "Controller": "UsersController",
-    "Method": "DeleteUser",
-    "HttpMethod": "DELETE",
-    "Route": "api/[controller]/{id}"
+    "file": "../tmp/UserController.cs",
+    "type": "Controller",
+    "controller": "UsersController",
+    "method": "DeleteUser",
+    "http_method": "DELETE",
+    "route": "api/[controller]/{id}"
   },
   {
-    "File": "../tmp/Minimal.cs",
-    "Type": "Minimal",
-    "HttpMethod": "GET",
-    "Route": "/users1/{id}",
-    "Handler": "(int id) =\u003E \n{\n    return Results.Ok(new { Id = id, Name = \u0022Alice\u0022 });\n}"
+    "file": "../tmp/Minimal.cs",
+    "type": "Minimal",
+    "http_method": "GET",
+    "route": "/users1/{id}",
+    "handler": "(int id) =\u003E \n{\n    return Results.Ok(new { Id = id, Name = \u0022Alice\u0022 });\n}"
   },
   {
-    "File": "../tmp/Minimal.cs",
-    "Type": "Minimal",
-    "HttpMethod": "POST",
-    "Route": "/users",
-    "Handler": "(UserDto user) =\u003E \n{\n    return Results.Created($\u0022/users/{123}\u0022, user);\n}"
+    "file": "../tmp/Minimal.cs",
+    "type": "Minimal",
+    "http_method": "POST",
+    "route": "/users",
+    "handler": "(UserDto user) =\u003E \n{\n    return Results.Created($\u0022/users/{123}\u0022, user);\n}"
   },
   {
-    "File": "../tmp/Minimal.cs",
-    "Type": "Minimal",
-    "HttpMethod": "DELETE",
-    "Route": "/users/{id}",
-    "Handler": "(int id) =\u003E\n{\n    return Results.NoContent();\n}"
+    "file": "../tmp/Minimal.cs",
+    "type": "Minimal",
+    "http_method": "DELETE",
+    "route": "/users/{id}",
+    "handler": "(int id) =\u003E\n{\n    return Results.NoContent();\n}"
   }
 ]

@@ -12,7 +12,8 @@ string outputPath = args.Length > 1 ? args[1] : "output.json";
 
 var jsonOptions = new JsonSerializerOptions
 {
-    WriteIndented = true,
+    WriteIndented = true, 
+    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
     // Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
 };
 
