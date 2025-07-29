@@ -10,7 +10,7 @@ using System.Text.Json;
 string rootPath = args.Length > 0 ? args[0] : "../tmp";
 string outputPath = args.Length > 1 ? args[1] : "output.json";
 
-var endpoints = new List<object>();
+var allEndpoints = new List<object>();
 
 foreach (var csFile in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.AllDirectories))
 {
@@ -25,9 +25,8 @@ foreach (var csFile in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.A
     {
         var classRoute = classNode.AttributeLists
             .SelectMany(a => a.Attributes)
-            .Where(a => a.Name.ToString().Contains("Route"))
-            .Select(a => a.ArgumentList?.Arguments.FirstOrDefault()?.ToString().Trim('"'))
-            .FirstOrDefault() ?? "[controller]";
+            .FirstOrDefault(a => a.Name.ToString().Contains("Route"))
+            ?.ArgumentList?.Arguments.FirstOrDefault()?.ToString().Trim('"') ?? "[controller]";
 
         foreach (var method in classNode.Members.OfType<MethodDeclarationSyntax>())
         {
@@ -40,9 +39,10 @@ foreach (var csFile in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.A
             var httpMethod = httpAttr.Name.ToString().Replace("Http", "").ToUpper();
             var methodRoute = httpAttr.ArgumentList?.Arguments.FirstOrDefault()?.ToString().Trim('"') ?? "";
 
-            endpoints.Add(new
+            allEndpoints.Add(new
             {
                 File = csFile,
+                Type = "Controller",
                 Controller = classNode.Identifier.ToString(),
                 Method = method.Identifier.ToString(),
                 HttpMethod = httpMethod,
@@ -50,12 +50,43 @@ foreach (var csFile in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.A
             });
         }
     }
+
+    var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
+    foreach (var call in invocations)
+    {
+        var expression = call.Expression as MemberAccessExpressionSyntax;
+        if (expression == null) continue;
+
+        var methodName = expression.Name.Identifier.Text;
+        if (!methodName.StartsWith("Map", StringComparison.OrdinalIgnoreCase)) continue;
+
+        var httpMethod = methodName.Replace("Map", "").ToUpper(); // GET, POST, etc.
+
+        var argsList = call.ArgumentList?.Arguments;
+        if (argsList == null || argsList.Value.Count == 0) continue;
+
+        var routeArg = argsList.Value[0].ToString().Trim('"');
+        allEndpoints.Add(new
+        {
+            File = csFile,
+            Type = "Minimal",
+            HttpMethod = httpMethod,
+            Route = routeArg,
+            Handler = argsList.Value.Count > 1 ? argsList.Value[1].ToString() : "Lambda/Delegate"
+        });
+    }
 }
 
-File.WriteAllText(outputPath, JsonSerializer.Serialize(endpoints, new JsonSerializerOptions { WriteIndented = true }));
+File.WriteAllText(outputPath, JsonSerializer.Serialize(
+    allEndpoints, 
+    new JsonSerializerOptions { 
+        WriteIndented = true,
+        // Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    })
+);
 Console.WriteLine($"API extraction complete. Saved to {outputPath}");
 
-string CombineRoutes(string classRoute, string methodRoute)
+static string CombineRoutes(string classRoute, string methodRoute)
 {
     if (string.IsNullOrEmpty(methodRoute)) return classRoute;
     return classRoute.TrimEnd('/') + "/" + methodRoute.TrimStart('/');
