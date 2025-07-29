@@ -10,6 +10,12 @@ using System.Text.Json;
 string rootPath = args.Length > 0 ? args[0] : "../tmp";
 string outputPath = args.Length > 1 ? args[1] : "output.json";
 
+var jsonOptions = new JsonSerializerOptions
+{
+    WriteIndented = true,
+    // Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+};
+
 var allEndpoints = new List<object>();
 
 foreach (var csFile in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.AllDirectories))
@@ -54,8 +60,7 @@ foreach (var csFile in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.A
     var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
     foreach (var call in invocations)
     {
-        var expression = call.Expression as MemberAccessExpressionSyntax;
-        if (expression == null) continue;
+        if (call.Expression is not MemberAccessExpressionSyntax expression) continue;
 
         var methodName = expression.Name.Identifier.Text;
         if (!methodName.StartsWith("Map", StringComparison.OrdinalIgnoreCase)) continue;
@@ -78,11 +83,7 @@ foreach (var csFile in Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.A
 }
 
 File.WriteAllText(outputPath, JsonSerializer.Serialize(
-    allEndpoints, 
-    new JsonSerializerOptions { 
-        WriteIndented = true,
-        // Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-    })
+    allEndpoints, jsonOptions)
 );
 Console.WriteLine($"API extraction complete. Saved to {outputPath}");
 
