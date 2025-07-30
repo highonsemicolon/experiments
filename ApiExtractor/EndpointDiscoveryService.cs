@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ApiExtractor
 {
-    public class EndpointExtractor(string rootPath, string outputPath)
+    public class EndpointDiscoveryService(string rootPath, string outputPath)
     {
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
