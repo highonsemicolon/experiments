@@ -24,12 +24,10 @@ namespace ApiExtractor
         public void Run()
         {
             var csFiles = Directory.EnumerateFiles(rootPath, "*.cs", SearchOption.AllDirectories);
-
             Parallel.ForEach(csFiles, ProcessFile);
 
             var json = JsonSerializer.Serialize(_allEndpoints, JsonOptions);
             File.WriteAllText(outputPath, json);
-            Console.WriteLine($"API extraction complete. Saved to {outputPath}");
         }
 
         private void ProcessFile(string csFile)
@@ -104,6 +102,5 @@ namespace ApiExtractor
             if (string.IsNullOrEmpty(methodRoute)) return classRoute;
             return classRoute.TrimEnd('/') + "/" + methodRoute.TrimStart('/');
         }
-
     }
 }
