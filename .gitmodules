@@ -1,0 +1,3 @@
+[submodule "redvault"]
+	path = redvault
+	url = git@github.com:highonsemicolon/redvault.git
