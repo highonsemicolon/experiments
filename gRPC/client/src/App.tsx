@@ -1,20 +1,26 @@
 import React, { useState } from "react"
-import { GreeterClient } from "./proto/GreeterServiceClientPb"
-import { HelloRequest } from "./proto/greeter_pb"
-
-const greetClient = async (name: string) => {
-  const EnvoyURL = "http://localhost:8000"
-  const client = new GreeterClient(EnvoyURL)
-  const request = new HelloRequest()
-  request.setName(name)
-  const response = await client.sayHello(request, {})
-  console.log(response)
-  const div = document.getElementById("response")
-  if (div) div.innerText = response.getMessage()
-}
+import { GreeterClient } from "./proto/greeter.client"
+import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport"
 
 function App() {
   const [name, setName] = useState("")
+  const [response, setResponse] = useState("")
+
+  const greetClient = async (name: string) => {
+    const EnvoyURL = "http://localhost:8000"
+    const transport = new GrpcWebFetchTransport({ baseUrl: EnvoyURL })
+    const client = new GreeterClient(transport)
+
+    try {
+      const res = await client.sayHello({ name })
+      console.log(res.response)
+      setResponse(res.response.message)
+    } catch (err) {
+      console.error("Error calling gRPC service:", err)
+      setResponse("Error: " + (err as Error).message)
+    }
+  }
+
   const onClickGreet = () => {
     if (name) greetClient(name)
   }
@@ -26,8 +32,8 @@ function App() {
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-      <button onClick={onClickGreet}>greet</button>
-      {name && <div id="response"></div>}
+      <button onClick={onClickGreet}>Greet</button>
+      <div id="response">{response}</div>
     </div>
   )
 }
