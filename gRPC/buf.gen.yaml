@@ -1,0 +1,12 @@
+version: v1
+plugins:
+  - plugin: go
+    out: server/proto
+    opt: paths=source_relative
+
+  - plugin: go-grpc
+    out: server/proto
+    opt: paths=source_relative
+
+  - plugin: buf.build/community/timostamm-protobuf-ts
+    out: client/src/proto
