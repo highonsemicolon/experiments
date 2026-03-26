@@ -7,6 +7,7 @@
 package proto
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -113,14 +114,14 @@ var File_greeter_proto protoreflect.FileDescriptor
 
 const file_greeter_proto_rawDesc = "" +
 	"\n" +
-	"\rgreeter.proto\x12\agreeter\"\"\n" +
+	"\rgreeter.proto\x12\agreeter\x1a\x1cgoogle/api/annotations.proto\"\"\n" +
 	"\fHelloRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"&\n" +
 	"\n" +
 	"HelloReply\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2A\n" +
-	"\aGreeter\x126\n" +
-	"\bSayHello\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReplyB9Z7github.com/highonsemicolon/experiments/grpc/proto;protob\x06proto3"
+	"\amessage\x18\x01 \x01(\tR\amessage2[\n" +
+	"\aGreeter\x12P\n" +
+	"\bSayHello\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/hello/{name}B9Z7github.com/highonsemicolon/experiments/grpc/proto;protob\x06proto3"
 
 var (
 	file_greeter_proto_rawDescOnce sync.Once

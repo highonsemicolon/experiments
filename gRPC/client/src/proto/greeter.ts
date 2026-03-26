@@ -127,5 +127,5 @@ export const HelloReply = new HelloReply$Type();
  * @generated ServiceType for protobuf service greeter.Greeter
  */
 export const Greeter = new ServiceType("greeter.Greeter", [
-    { name: "SayHello", options: {}, I: HelloRequest, O: HelloReply }
+    { name: "SayHello", options: { "google.api.http": { get: "/v1/hello/{name}" } }, I: HelloRequest, O: HelloReply }
 ]);
