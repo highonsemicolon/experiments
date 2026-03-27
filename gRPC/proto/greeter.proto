@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 package greeter;
-option go_package = "github.com/highonsemicolon/experiments/grpc/proto;proto";
 
 import "google/api/annotations.proto";
 

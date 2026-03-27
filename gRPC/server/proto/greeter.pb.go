@@ -121,7 +121,7 @@ const file_greeter_proto_rawDesc = "" +
 	"HelloReply\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage2[\n" +
 	"\aGreeter\x12P\n" +
-	"\bSayHello\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/hello/{name}B9Z7github.com/highonsemicolon/experiments/grpc/proto;protob\x06proto3"
+	"\bSayHello\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/hello/{name}b\x06proto3"
 
 var (
 	file_greeter_proto_rawDescOnce sync.Once
