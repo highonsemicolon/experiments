@@ -5,9 +5,7 @@ services:
       dockerfile: Dockerfile
 
   envoy_service:
-    build:
-      context: .
-      dockerfile: envoy.Dockerfile
+    image: envoyproxy/envoy:v1.22.0
     ports:
       - "8000:8000"
     volumes:
