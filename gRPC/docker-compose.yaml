@@ -7,7 +7,8 @@ services:
   envoy_service:
     image: envoyproxy/envoy:v1.33-latest
     ports:
-      - "8000:8000"
+      - 8000:8000
+      - 9901:9901
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
       - ./descriptor.pb:/etc/envoy/descriptor.pb
