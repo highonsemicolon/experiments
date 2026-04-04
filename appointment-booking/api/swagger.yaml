@@ -70,7 +70,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: List of availability windows
@@ -95,7 +95,7 @@ paths:
           in: query
           required: true
           schema:
-            type: integer
+            type: string
         - name: date
           in: query
           required: true
@@ -224,9 +224,9 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         user_id:
-          type: integer
+          type: string
         name:
           type: string
         email:
@@ -269,7 +269,7 @@ components:
       required: [coach_id, slot_time]
       properties:
         coach_id:
-          type: integer
+          type: string
         slot_time:
           type: string
           format: date-time
@@ -280,9 +280,9 @@ components:
         id:
           type: integer
         user_id:
-          type: integer
+          type: string
         coach_id:
-          type: integer
+          type: string
         coach_name:
           type: string
         slot_time:
@@ -299,7 +299,7 @@ components:
       type: object
       properties:
         coach_id:
-          type: integer
+          type: string
         date:
           type: string
         timezone:

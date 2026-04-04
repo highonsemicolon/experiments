@@ -77,7 +77,7 @@ type AvailabilityResponse struct {
 
 // AvailableSlotsResponse defines model for AvailableSlotsResponse.
 type AvailableSlotsResponse struct {
-	CoachId  *int         `json:"coach_id,omitempty"`
+	CoachId  *string      `json:"coach_id,omitempty"`
 	Date     *string      `json:"date,omitempty"`
 	Slots    *[]time.Time `json:"slots,omitempty"`
 	Timezone *string      `json:"timezone,omitempty"`
@@ -85,13 +85,13 @@ type AvailableSlotsResponse struct {
 
 // BookingResponse defines model for BookingResponse.
 type BookingResponse struct {
-	CoachId   *int                   `json:"coach_id,omitempty"`
+	CoachId   *string                `json:"coach_id,omitempty"`
 	CoachName *string                `json:"coach_name,omitempty"`
 	CreatedAt *time.Time             `json:"created_at,omitempty"`
 	Id        *int                   `json:"id,omitempty"`
 	SlotTime  *time.Time             `json:"slot_time,omitempty"`
 	Status    *BookingResponseStatus `json:"status,omitempty"`
-	UserId    *int                   `json:"user_id,omitempty"`
+	UserId    *string                `json:"user_id,omitempty"`
 }
 
 // BookingResponseStatus defines model for BookingResponse.Status.
@@ -101,14 +101,14 @@ type BookingResponseStatus string
 type CoachResponse struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Email     *string    `json:"email,omitempty"`
-	Id        *int       `json:"id,omitempty"`
+	Id        *string    `json:"id,omitempty"`
 	Name      *string    `json:"name,omitempty"`
-	UserId    *int       `json:"user_id,omitempty"`
+	UserId    *string    `json:"user_id,omitempty"`
 }
 
 // CreateBookingRequest defines model for CreateBookingRequest.
 type CreateBookingRequest struct {
-	CoachId  int       `json:"coach_id"`
+	CoachId  string    `json:"coach_id"`
 	SlotTime time.Time `json:"slot_time"`
 }
 
@@ -189,7 +189,7 @@ type CancelBookingParams struct {
 
 // GetAvailableSlotsParams defines parameters for GetAvailableSlots.
 type GetAvailableSlotsParams struct {
-	CoachId  int                `form:"coach_id" json:"coach_id"`
+	CoachId  string             `form:"coach_id" json:"coach_id"`
 	Date     openapi_types.Date `form:"date" json:"date"`
 	Timezone *string            `form:"timezone,omitempty" json:"timezone,omitempty"`
 }
@@ -213,7 +213,7 @@ type ServerInterface interface {
 	RegisterCoach(c *gin.Context, params RegisterCoachParams)
 	// Get coach availability settings
 	// (GET /coaches/{coachId}/availability)
-	GetCoachAvailability(c *gin.Context, coachId int)
+	GetCoachAvailability(c *gin.Context, coachId string)
 	// Get all bookings for current user
 	// (GET /users/bookings)
 	GetUserBookings(c *gin.Context, params GetUserBookingsParams)
@@ -327,9 +327,9 @@ func (siw *ServerInterfaceWrapper) GetCoachAvailability(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "coachId" -------------
-	var coachId int
+	var coachId string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "coachId", c.Param("coachId"), &coachId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "integer", Format: ""})
+	err = runtime.BindStyledParameterWithOptions("simple", "coachId", c.Param("coachId"), &coachId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter coachId: %w", err), http.StatusBadRequest)
 		return
@@ -505,7 +505,7 @@ func (siw *ServerInterfaceWrapper) GetAvailableSlots(c *gin.Context) {
 		return
 	}
 
-	err = runtime.BindQueryParameterWithOptions("form", true, true, "coach_id", c.Request.URL.Query(), &params.CoachId, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "coach_id", c.Request.URL.Query(), &params.CoachId, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter coach_id: %w", err), http.StatusBadRequest)
 		return
@@ -692,7 +692,7 @@ func (response RegisterCoach500JSONResponse) VisitRegisterCoachResponse(w http.R
 }
 
 type GetCoachAvailabilityRequestObject struct {
-	CoachId int `json:"coachId"`
+	CoachId string `json:"coachId"`
 }
 
 type GetCoachAvailabilityResponseObject interface {
@@ -1011,7 +1011,7 @@ func (sh *strictHandler) RegisterCoach(ctx *gin.Context, params RegisterCoachPar
 }
 
 // GetCoachAvailability operation middleware
-func (sh *strictHandler) GetCoachAvailability(ctx *gin.Context, coachId int) {
+func (sh *strictHandler) GetCoachAvailability(ctx *gin.Context, coachId string) {
 	var request GetCoachAvailabilityRequestObject
 
 	request.CoachId = coachId
