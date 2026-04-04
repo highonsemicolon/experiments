@@ -2,15 +2,11 @@ package model
 
 import "time"
 
-type User struct {
+type Coach struct {
     ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
     Name      string    `gorm:"not null"                json:"name"`
     Email     string    `gorm:"uniqueIndex;not null"    json:"email"`
     CreatedAt time.Time `json:"created_at"`
-}
-
-type Coach struct {
-    User
 }
 
 type Availability struct {
@@ -34,5 +30,4 @@ type Booking struct {
     CreatedAt time.Time `json:"created_at"`
 
     Coach Coach `gorm:"foreignKey:CoachID" json:"-"`
-    User  User  `gorm:"foreignKey:UserID"  json:"-"`
 }
