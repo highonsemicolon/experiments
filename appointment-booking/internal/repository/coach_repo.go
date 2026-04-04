@@ -7,6 +7,7 @@ import (
 )
 
 type CoachRepository interface {
+	RegisterCoach(coach *model.Coach) error
 	GetByID(coachID uint) (*model.Coach, error)
 	CreateAvailability(a *model.Availability) error
 	GetAvailabilityByID(coachID uint) ([]model.Availability, error)
@@ -19,6 +20,13 @@ type coachRepository struct {
 
 func NewCoachRepository(db *gorm.DB) CoachRepository {
 	return &coachRepository{db: db}
+}
+
+func (r *coachRepository) RegisterCoach(coach *model.Coach) error {
+	if err := r.db.Where(model.Coach{ID: coach.ID}).FirstOrCreate(coach).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *coachRepository) GetByID(coachID uint) (*model.Coach, error) {
