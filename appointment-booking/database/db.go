@@ -20,8 +20,8 @@ func Connect(cfg *config.Config) *gorm.DB {
 	}
 
 	if err := db.AutoMigrate(
+		&model.User{},
 		&model.Coach{},
-&model.User{},
 		&model.Availability{},
 		&model.Booking{},
 	); err != nil {
