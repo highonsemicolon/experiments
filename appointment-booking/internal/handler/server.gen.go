@@ -99,13 +99,19 @@ type BookingResponse struct {
 // BookingResponseStatus defines model for BookingResponse.Status.
 type BookingResponseStatus string
 
+// CoachResponse defines model for CoachResponse.
+type CoachResponse struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Email     *string    `json:"email,omitempty"`
+	Id        *int       `json:"id,omitempty"`
+	Name      *string    `json:"name,omitempty"`
+	UserId    *int       `json:"user_id,omitempty"`
+}
+
 // CreateBookingRequest defines model for CreateBookingRequest.
 type CreateBookingRequest struct {
-	CoachId int `json:"coach_id"`
-
-	// SlotTime Must be a valid available slot in RFC3339/UTC format
+	CoachId  int       `json:"coach_id"`
 	SlotTime time.Time `json:"slot_time"`
-	UserId   int       `json:"user_id"`
 }
 
 // ErrorResponse defines model for ErrorResponse.
@@ -119,23 +125,26 @@ type MessageResponse struct {
 	Message *string `json:"message,omitempty"`
 }
 
+// RegisterCoachRequest defines model for RegisterCoachRequest.
+type RegisterCoachRequest struct {
+	Email openapi_types.Email `json:"email"`
+	Name  string              `json:"name"`
+}
+
 // SetAvailabilityRequest defines model for SetAvailabilityRequest.
 type SetAvailabilityRequest struct {
 	CoachId   int                             `json:"coach_id"`
 	DayOfWeek SetAvailabilityRequestDayOfWeek `json:"day_of_week"`
-
-	// EndTime 24-hour format HH:MM in coach's local time
-	EndTime string `json:"end_time"`
-
-	// StartTime 24-hour format HH:MM in coach's local time
-	StartTime string `json:"start_time"`
-
-	// Timezone IANA timezone of the coach (defaults to UTC)
-	Timezone *string `json:"timezone,omitempty"`
+	EndTime   string                          `json:"end_time"`
+	StartTime string                          `json:"start_time"`
+	Timezone  *string                         `json:"timezone,omitempty"`
 }
 
 // SetAvailabilityRequestDayOfWeek defines model for SetAvailabilityRequest.DayOfWeek.
 type SetAvailabilityRequestDayOfWeek string
+
+// UserIdHeader defines model for UserIdHeader.
+type UserIdHeader = int
 
 // BadRequest defines model for BadRequest.
 type BadRequest = ErrorResponse
@@ -152,35 +161,53 @@ type InternalError = ErrorResponse
 // NotFound defines model for NotFound.
 type NotFound = ErrorResponse
 
+// Unauthorized defines model for Unauthorized.
+type Unauthorized = ErrorResponse
+
+// SetCoachAvailabilityParams defines parameters for SetCoachAvailability.
+type SetCoachAvailabilityParams struct {
+	// UserID Injected by API Gateway after authentication
+	UserID UserIdHeader `json:"User-ID"`
+}
+
+// RegisterCoachParams defines parameters for RegisterCoach.
+type RegisterCoachParams struct {
+	// UserID Injected by API Gateway after authentication
+	UserID UserIdHeader `json:"User-ID"`
+}
+
 // GetUserBookingsParams defines parameters for GetUserBookings.
 type GetUserBookingsParams struct {
-	// UserId ID of the user
-	UserId int `form:"user_id" json:"user_id"`
-
-	// Timezone IANA timezone for returned booking times (defaults to UTC)
 	Timezone *string `form:"timezone,omitempty" json:"timezone,omitempty"`
+
+	// UserID Injected by API Gateway after authentication
+	UserID UserIdHeader `json:"User-ID"`
+}
+
+// CreateBookingParams defines parameters for CreateBooking.
+type CreateBookingParams struct {
+	// UserID Injected by API Gateway after authentication
+	UserID UserIdHeader `json:"User-ID"`
 }
 
 // CancelBookingParams defines parameters for CancelBooking.
 type CancelBookingParams struct {
-	// UserId ID of the user (ownership check)
-	UserId int `form:"user_id" json:"user_id"`
+	// UserID Injected by API Gateway after authentication
+	UserID UserIdHeader `json:"User-ID"`
 }
 
 // GetAvailableSlotsParams defines parameters for GetAvailableSlots.
 type GetAvailableSlotsParams struct {
-	// CoachId ID of the coach
-	CoachId int `form:"coach_id" json:"coach_id"`
-
-	// Date Date to query in YYYY-MM-DD format
-	Date openapi_types.Date `form:"date" json:"date"`
-
-	// Timezone IANA timezone for returned slot times (defaults to UTC)
-	Timezone *string `form:"timezone,omitempty" json:"timezone,omitempty"`
+	CoachId  int                `form:"coach_id" json:"coach_id"`
+	Date     openapi_types.Date `form:"date" json:"date"`
+	Timezone *string            `form:"timezone,omitempty" json:"timezone,omitempty"`
 }
 
 // SetCoachAvailabilityJSONRequestBody defines body for SetCoachAvailability for application/json ContentType.
 type SetCoachAvailabilityJSONRequestBody = SetAvailabilityRequest
+
+// RegisterCoachJSONRequestBody defines body for RegisterCoach for application/json ContentType.
+type RegisterCoachJSONRequestBody = RegisterCoachRequest
 
 // CreateBookingJSONRequestBody defines body for CreateBooking for application/json ContentType.
 type CreateBookingJSONRequestBody = CreateBookingRequest
@@ -189,16 +216,19 @@ type CreateBookingJSONRequestBody = CreateBookingRequest
 type ServerInterface interface {
 	// Set coach weekly availability
 	// (POST /coaches/availability)
-	SetCoachAvailability(c *gin.Context)
+	SetCoachAvailability(c *gin.Context, params SetCoachAvailabilityParams)
+	// Register current user as a coach
+	// (POST /coaches/register)
+	RegisterCoach(c *gin.Context, params RegisterCoachParams)
 	// Get coach availability settings
 	// (GET /coaches/{coachId}/availability)
 	GetCoachAvailability(c *gin.Context, coachId int)
-	// Get all bookings for a user
+	// Get all bookings for current user
 	// (GET /users/bookings)
 	GetUserBookings(c *gin.Context, params GetUserBookingsParams)
 	// Book a 30-minute appointment slot
 	// (POST /users/bookings)
-	CreateBooking(c *gin.Context)
+	CreateBooking(c *gin.Context, params CreateBookingParams)
 	// Cancel a booking
 	// (DELETE /users/bookings/{bookingId})
 	CancelBooking(c *gin.Context, bookingId int, params CancelBookingParams)
@@ -219,6 +249,35 @@ type MiddlewareFunc func(c *gin.Context)
 // SetCoachAvailability operation middleware
 func (siw *ServerInterfaceWrapper) SetCoachAvailability(c *gin.Context) {
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SetCoachAvailabilityParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "User-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("User-ID")]; found {
+		var UserID UserIdHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for User-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter User-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -226,7 +285,49 @@ func (siw *ServerInterfaceWrapper) SetCoachAvailability(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.SetCoachAvailability(c)
+	siw.Handler.SetCoachAvailability(c, params)
+}
+
+// RegisterCoach operation middleware
+func (siw *ServerInterfaceWrapper) RegisterCoach(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RegisterCoachParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "User-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("User-ID")]; found {
+		var UserID UserIdHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for User-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter User-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.RegisterCoach(c, params)
 }
 
 // GetCoachAvailability operation middleware
@@ -261,26 +362,35 @@ func (siw *ServerInterfaceWrapper) GetUserBookings(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUserBookingsParams
 
-	// ------------- Required query parameter "user_id" -------------
-
-	if paramValue := c.Query("user_id"); paramValue != "" {
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument user_id is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	err = runtime.BindQueryParameterWithOptions("form", true, true, "user_id", c.Request.URL.Query(), &params.UserId, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter user_id: %w", err), http.StatusBadRequest)
-		return
-	}
-
 	// ------------- Optional query parameter "timezone" -------------
 
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "timezone", c.Request.URL.Query(), &params.Timezone, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter timezone: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "User-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("User-ID")]; found {
+		var UserID UserIdHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for User-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter User-ID is required, but not found"), http.StatusBadRequest)
 		return
 	}
 
@@ -297,6 +407,35 @@ func (siw *ServerInterfaceWrapper) GetUserBookings(c *gin.Context) {
 // CreateBooking operation middleware
 func (siw *ServerInterfaceWrapper) CreateBooking(c *gin.Context) {
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateBookingParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "User-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("User-ID")]; found {
+		var UserID UserIdHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for User-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter User-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -304,7 +443,7 @@ func (siw *ServerInterfaceWrapper) CreateBooking(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.CreateBooking(c)
+	siw.Handler.CreateBooking(c, params)
 }
 
 // CancelBooking operation middleware
@@ -324,18 +463,27 @@ func (siw *ServerInterfaceWrapper) CancelBooking(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params CancelBookingParams
 
-	// ------------- Required query parameter "user_id" -------------
+	headers := c.Request.Header
 
-	if paramValue := c.Query("user_id"); paramValue != "" {
+	// ------------- Required header parameter "User-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("User-ID")]; found {
+		var UserID UserIdHeader
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for User-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
 
 	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument user_id is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	err = runtime.BindQueryParameterWithOptions("form", true, true, "user_id", c.Request.URL.Query(), &params.UserId, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter user_id: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter User-ID is required, but not found"), http.StatusBadRequest)
 		return
 	}
 
@@ -433,6 +581,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.POST(options.BaseURL+"/coaches/availability", wrapper.SetCoachAvailability)
+	router.POST(options.BaseURL+"/coaches/register", wrapper.RegisterCoach)
 	router.GET(options.BaseURL+"/coaches/:coachId/availability", wrapper.GetCoachAvailability)
 	router.GET(options.BaseURL+"/users/bookings", wrapper.GetUserBookings)
 	router.POST(options.BaseURL+"/users/bookings", wrapper.CreateBooking)
@@ -450,8 +599,11 @@ type InternalErrorJSONResponse ErrorResponse
 
 type NotFoundJSONResponse ErrorResponse
 
+type UnauthorizedJSONResponse ErrorResponse
+
 type SetCoachAvailabilityRequestObject struct {
-	Body *SetCoachAvailabilityJSONRequestBody
+	Params SetCoachAvailabilityParams
+	Body   *SetCoachAvailabilityJSONRequestBody
 }
 
 type SetCoachAvailabilityResponseObject interface {
@@ -488,6 +640,60 @@ func (response SetCoachAvailability409JSONResponse) VisitSetCoachAvailabilityRes
 type SetCoachAvailability500JSONResponse struct{ InternalErrorJSONResponse }
 
 func (response SetCoachAvailability500JSONResponse) VisitSetCoachAvailabilityResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RegisterCoachRequestObject struct {
+	Params RegisterCoachParams
+	Body   *RegisterCoachJSONRequestBody
+}
+
+type RegisterCoachResponseObject interface {
+	VisitRegisterCoachResponse(w http.ResponseWriter) error
+}
+
+type RegisterCoach201JSONResponse CoachResponse
+
+func (response RegisterCoach201JSONResponse) VisitRegisterCoachResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RegisterCoach400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response RegisterCoach400JSONResponse) VisitRegisterCoachResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RegisterCoach401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response RegisterCoach401JSONResponse) VisitRegisterCoachResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RegisterCoach409JSONResponse struct{ ConflictJSONResponse }
+
+func (response RegisterCoach409JSONResponse) VisitRegisterCoachResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RegisterCoach500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response RegisterCoach500JSONResponse) VisitRegisterCoachResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -565,7 +771,8 @@ func (response GetUserBookings500JSONResponse) VisitGetUserBookingsResponse(w ht
 }
 
 type CreateBookingRequestObject struct {
-	Body *CreateBookingJSONRequestBody
+	Params CreateBookingParams
+	Body   *CreateBookingJSONRequestBody
 }
 
 type CreateBookingResponseObject interface {
@@ -711,10 +918,13 @@ type StrictServerInterface interface {
 	// Set coach weekly availability
 	// (POST /coaches/availability)
 	SetCoachAvailability(ctx context.Context, request SetCoachAvailabilityRequestObject) (SetCoachAvailabilityResponseObject, error)
+	// Register current user as a coach
+	// (POST /coaches/register)
+	RegisterCoach(ctx context.Context, request RegisterCoachRequestObject) (RegisterCoachResponseObject, error)
 	// Get coach availability settings
 	// (GET /coaches/{coachId}/availability)
 	GetCoachAvailability(ctx context.Context, request GetCoachAvailabilityRequestObject) (GetCoachAvailabilityResponseObject, error)
-	// Get all bookings for a user
+	// Get all bookings for current user
 	// (GET /users/bookings)
 	GetUserBookings(ctx context.Context, request GetUserBookingsRequestObject) (GetUserBookingsResponseObject, error)
 	// Book a 30-minute appointment slot
@@ -741,8 +951,10 @@ type strictHandler struct {
 }
 
 // SetCoachAvailability operation middleware
-func (sh *strictHandler) SetCoachAvailability(ctx *gin.Context) {
+func (sh *strictHandler) SetCoachAvailability(ctx *gin.Context, params SetCoachAvailabilityParams) {
 	var request SetCoachAvailabilityRequestObject
+
+	request.Params = params
 
 	var body SetCoachAvailabilityJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -766,6 +978,41 @@ func (sh *strictHandler) SetCoachAvailability(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(SetCoachAvailabilityResponseObject); ok {
 		if err := validResponse.VisitSetCoachAvailabilityResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RegisterCoach operation middleware
+func (sh *strictHandler) RegisterCoach(ctx *gin.Context, params RegisterCoachParams) {
+	var request RegisterCoachRequestObject
+
+	request.Params = params
+
+	var body RegisterCoachJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RegisterCoach(ctx, request.(RegisterCoachRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RegisterCoach")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(RegisterCoachResponseObject); ok {
+		if err := validResponse.VisitRegisterCoachResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -828,8 +1075,10 @@ func (sh *strictHandler) GetUserBookings(ctx *gin.Context, params GetUserBooking
 }
 
 // CreateBooking operation middleware
-func (sh *strictHandler) CreateBooking(ctx *gin.Context) {
+func (sh *strictHandler) CreateBooking(ctx *gin.Context, params CreateBookingParams) {
 	var request CreateBookingRequestObject
+
+	request.Params = params
 
 	var body CreateBookingJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
