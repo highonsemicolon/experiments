@@ -15,10 +15,10 @@ var (
 )
 
 type CoachService interface {
-	RegisterCoach(userID uint, name, email string) (*model.Coach, error)
-	GetCoachByID(coachID uint) (*model.Coach, error)
-	SetAvailability(coachID uint, req SetAvailabilityInput) (*model.Availability, error)
-	GetCoachAvailability(coachID uint) ([]model.Availability, error)
+	RegisterCoach(userID string, name, email string) (*model.Coach, error)
+	GetCoachByID(coachID string) (*model.Coach, error)
+	SetAvailability(coachID string, req SetAvailabilityInput) (*model.Availability, error)
+	GetCoachAvailability(coachID string) ([]model.Availability, error)
 }
 
 type SetAvailabilityInput struct {
@@ -36,19 +36,22 @@ func NewCoachService(coachRepo repository.CoachRepository) CoachService {
 	return &coachService{coachRepo: coachRepo}
 }
 
-func (s *coachService) RegisterCoach(userID uint, name, email string) (*model.Coach, error) {
+func (s *coachService) RegisterCoach(userID string, name, email string) (*model.Coach, error) {
 	coach := &model.Coach{
 		ID:    userID,
 		Name:  name,
 		Email: email,
 	}
 	if err := s.coachRepo.RegisterCoach(coach); err != nil {
+		if errors.Is(err, repository.ErrCoachAlreadyExists) {
+			return nil, ErrCoachAlreadyExists
+		}
 		return nil, err
 	}
 	return coach, nil
 }
 
-func (s *coachService) GetCoachByID(coachID uint) (*model.Coach, error) {
+func (s *coachService) GetCoachByID(coachID string) (*model.Coach, error) {
 	coach, err := s.coachRepo.GetByID(coachID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -59,7 +62,7 @@ func (s *coachService) GetCoachByID(coachID uint) (*model.Coach, error) {
 	return coach, nil
 }
 
-func (s *coachService) SetAvailability(coachID uint, req SetAvailabilityInput) (*model.Availability, error) {
+func (s *coachService) SetAvailability(coachID string, req SetAvailabilityInput) (*model.Availability, error) {
 
 	tz := req.Timezone
 	if tz == "" {
@@ -80,6 +83,6 @@ func (s *coachService) SetAvailability(coachID uint, req SetAvailabilityInput) (
 	return availability, nil
 }
 
-func (s *coachService) GetCoachAvailability(coachID uint) ([]model.Availability, error) {
+func (s *coachService) GetCoachAvailability(coachID string) ([]model.Availability, error) {
 	return s.coachRepo.GetAvailabilityByID(coachID)
 }
