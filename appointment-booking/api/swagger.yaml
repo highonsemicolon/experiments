@@ -188,12 +188,11 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        '204':
           description: Booking cancelled successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponse'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -241,10 +240,8 @@ components:
 
     SetAvailabilityRequest:
       type: object
-      required: [coach_id, day_of_week, start_time, end_time]
+      required: [day_of_week, start_time, end_time]
       properties:
-        coach_id:
-          type: integer
         day_of_week:
           type: string
           enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
@@ -261,10 +258,6 @@ components:
     AvailabilityResponse:
       type: object
       properties:
-        id:
-          type: integer
-        coach_id:
-          type: integer
         day_of_week:
           type: string
         start_time:
@@ -319,20 +312,11 @@ components:
           items:
             type: string
             format: date-time
-
-    MessageResponse:
-      type: object
-      properties:
-        message:
-          type: string
-
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
-        code:
-          type: integer
 
   responses:
     BadRequest:
