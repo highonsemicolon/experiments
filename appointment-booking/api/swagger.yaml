@@ -1,0 +1,352 @@
+openapi: "3.0.0"
+info:
+  title: Appointment Booking API
+  description: Connects coaches with users for 30-minute appointment slots
+  version: "1.0.0"
+
+servers:
+  - url: /api/v1
+
+paths:
+  /coaches/availability:
+    post:
+      summary: Set coach weekly availability
+      operationId: SetCoachAvailability
+      tags: [Coach]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetAvailabilityRequest'
+      responses:
+        '201':
+          description: Availability set successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /coaches/{coachId}/availability:
+    get:
+      summary: Get coach availability settings
+      operationId: GetCoachAvailability
+      tags: [Coach]
+      parameters:
+        - name: coachId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of availability windows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilityResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /users/slots:
+    get:
+      summary: Get available 30-minute slots for a coach on a specific date
+      operationId: GetAvailableSlots
+      tags: [User]
+      parameters:
+        - name: coach_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID of the coach
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2025-10-28"
+          description: Date to query in YYYY-MM-DD format
+        - name: timezone
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "Asia/Kolkata"
+          description: IANA timezone for returned slot times (defaults to UTC)
+      responses:
+        '200':
+          description: List of available slots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableSlotsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /users/bookings:
+    post:
+      summary: Book a 30-minute appointment slot
+      operationId: CreateBooking
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    get:
+      summary: Get all bookings for a user
+      operationId: GetUserBookings
+      tags: [User]
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+        - name: timezone
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "Asia/Kolkata"
+          description: IANA timezone for returned booking times (defaults to UTC)
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /users/bookings/{bookingId}:
+    delete:
+      summary: Cancel a booking
+      operationId: CancelBooking
+      tags: [User]
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the booking to cancel
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID of the user (ownership check)
+      responses:
+        '200':
+          description: Booking cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  schemas:
+    SetAvailabilityRequest:
+      type: object
+      required: [coach_id, day_of_week, start_time, end_time]
+      properties:
+        coach_id:
+          type: integer
+          example: 1
+        day_of_week:
+          type: string
+          enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+          example: "Monday"
+        start_time:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: "09:00"
+          description: 24-hour format HH:MM in coach's local time
+        end_time:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: "17:00"
+          description: 24-hour format HH:MM in coach's local time
+        timezone:
+          type: string
+          example: "America/New_York"
+          description: IANA timezone of the coach (defaults to UTC)
+
+    AvailabilityResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        coach_id:
+          type: integer
+          example: 1
+        day_of_week:
+          type: string
+          example: "Monday"
+        start_time:
+          type: string
+          example: "09:00"
+        end_time:
+          type: string
+          example: "17:00"
+        timezone:
+          type: string
+          example: "America/New_York"
+
+    CreateBookingRequest:
+      type: object
+      required: [user_id, coach_id, slot_time]
+      properties:
+        user_id:
+          type: integer
+          example: 101
+        coach_id:
+          type: integer
+          example: 1
+        slot_time:
+          type: string
+          format: date-time
+          example: "2025-10-28T09:30:00Z"
+          description: Must be a valid available slot in RFC3339/UTC format
+
+    BookingResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 101
+        coach_id:
+          type: integer
+          example: 1
+        coach_name:
+          type: string
+          example: "Jane Doe"
+        slot_time:
+          type: string
+          format: date-time
+          example: "2025-10-28T09:30:00Z"
+        status:
+          type: string
+          enum: [booked, cancelled]
+          example: "booked"
+        created_at:
+          type: string
+          format: date-time
+
+    AvailableSlotsResponse:
+      type: object
+      properties:
+        coach_id:
+          type: integer
+          example: 1
+        date:
+          type: string
+          example: "2025-10-28"
+        timezone:
+          type: string
+          example: "Asia/Kolkata"
+        slots:
+          type: array
+          items:
+            type: string
+            format: date-time
+          example: ["2025-10-28T09:00:00Z", "2025-10-28T09:30:00Z"]
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Booking cancelled successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "slot already booked"
+        code:
+          type: integer
+          example: 409
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Resource conflict (e.g. slot already booked)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: User does not own this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
