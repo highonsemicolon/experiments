@@ -208,7 +208,7 @@ components:
       in: header
       required: true
       schema:
-        type: integer
+        type: string
       description: Injected by API Gateway after authentication
 
   schemas:
