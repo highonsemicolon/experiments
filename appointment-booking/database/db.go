@@ -20,12 +20,18 @@ func Connect(cfg *config.Config) *gorm.DB {
 	}
 
 	if err := db.AutoMigrate(
-				&model.Coach{},
+		&model.Coach{},
 		&model.Availability{},
 		&model.Booking{},
 	); err != nil {
 		log.Fatalf("failed to run migrations: %v", err)
 	}
+
+	db.Exec(`
+		ALTER TABLE bookings 
+		ADD CONSTRAINT IF NOT EXISTS uq_coach_slot 
+		UNIQUE (coach_id, slot_time, status)
+	`)
 
 	log.Println("database connected and migrated")
 	return db

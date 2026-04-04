@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -11,12 +12,12 @@ import (
 
 type BookingRepository interface {
 	BeginTx() *gorm.DB
-	GetBookedSlotsForDay(coachID uint, from, to time.Time) ([]time.Time, error)
-	LockAndGetSlot(tx *gorm.DB, coachID uint, startTime time.Time) (*model.Booking, error)
+	GetBookedSlotsForDay(coachID string, from, to time.Time) ([]time.Time, error)
+	LockAndGetSlot(tx *gorm.DB, coachID string, startTime time.Time) (*model.Booking, error)
 	CreateBookingTx(tx *gorm.DB, booking *model.Booking) error
 	GetBookingByID(bookingID uint) (*model.Booking, error)
-	GetUserBookings(userID uint) ([]model.Booking, error)
-	CancelBooking(bookingID, userID uint) error
+	GetUserBookings(userID string) ([]model.Booking, error)
+	CancelBooking(bookingID uint, userID string) error
 }
 
 type bookingRepository struct {
@@ -31,7 +32,7 @@ func (r *bookingRepository) BeginTx() *gorm.DB {
 	return r.db.Begin()
 }
 
-func (r *bookingRepository) GetBookedSlotsForDay(coachID uint, from, to time.Time) ([]time.Time, error) {
+func (r *bookingRepository) GetBookedSlotsForDay(coachID string, from, to time.Time) ([]time.Time, error) {
 	var slots []time.Time
 	err := r.db.Model(&model.Booking{}).
 		Where("coach_id = ? AND start_time >= ? AND start_time < ? AND status = 'booked'",
@@ -40,14 +41,14 @@ func (r *bookingRepository) GetBookedSlotsForDay(coachID uint, from, to time.Tim
 	return slots, err
 }
 
-func (r *bookingRepository) LockAndGetSlot(tx *gorm.DB, coachID uint, startTime time.Time) (*model.Booking, error) {
+func (r *bookingRepository) LockAndGetSlot(tx *gorm.DB, coachID string, startTime time.Time) (*model.Booking, error) {
 	var booking model.Booking
 	err := tx.
 		Clauses(clause.Locking{Strength: "UPDATE"}).
 		Where("coach_id = ? AND start_time = ? AND status = 'booked'", coachID, startTime).
 		First(&booking).Error
 
-	if err == gorm.ErrRecordNotFound {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
 	if err != nil {
@@ -68,18 +69,18 @@ func (r *bookingRepository) GetBookingByID(bookingID uint) (*model.Booking, erro
 	return &booking, nil
 }
 
-func (r *bookingRepository) GetUserBookings(userID uint) ([]model.Booking, error) {
-	var bookings []model.Booking
-	if err := r.db.Preload("Coach").
-		Where("user_id = ? AND status = 'booked'", userID).
-		Order("start_time ASC").
-		Find(&bookings).Error; err != nil {
-		return nil, err
-	}
-	return bookings, nil
+func (r *bookingRepository) GetUserBookings(userID string) ([]model.Booking, error) {
+    var bookings []model.Booking
+    if err := r.db.Preload("Coach").
+        Where("user_id = ?", userID).
+        Order("start_time ASC").
+        Find(&bookings).Error; err != nil {
+        return nil, err
+    }
+    return bookings, nil
 }
 
-func (r *bookingRepository) CancelBooking(bookingID, userID uint) error {
+func (r *bookingRepository) CancelBooking(bookingID uint, userID string) error {
 	result := r.db.Model(&model.Booking{}).
 		Where("id = ? AND user_id = ?", bookingID, userID).
 		Update("status", "cancelled")
