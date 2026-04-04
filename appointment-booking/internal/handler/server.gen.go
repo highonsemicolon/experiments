@@ -69,10 +69,8 @@ func (e SetAvailabilityRequestDayOfWeek) Valid() bool {
 
 // AvailabilityResponse defines model for AvailabilityResponse.
 type AvailabilityResponse struct {
-	CoachId   *int    `json:"coach_id,omitempty"`
 	DayOfWeek *string `json:"day_of_week,omitempty"`
 	EndTime   *string `json:"end_time,omitempty"`
-	Id        *int    `json:"id,omitempty"`
 	StartTime *string `json:"start_time,omitempty"`
 	Timezone  *string `json:"timezone,omitempty"`
 }
@@ -116,13 +114,7 @@ type CreateBookingRequest struct {
 
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
-	Code  *int    `json:"code,omitempty"`
 	Error *string `json:"error,omitempty"`
-}
-
-// MessageResponse defines model for MessageResponse.
-type MessageResponse struct {
-	Message *string `json:"message,omitempty"`
 }
 
 // RegisterCoachRequest defines model for RegisterCoachRequest.
@@ -133,7 +125,6 @@ type RegisterCoachRequest struct {
 
 // SetAvailabilityRequest defines model for SetAvailabilityRequest.
 type SetAvailabilityRequest struct {
-	CoachId   int                             `json:"coach_id"`
 	DayOfWeek SetAvailabilityRequestDayOfWeek `json:"day_of_week"`
 	EndTime   string                          `json:"end_time"`
 	StartTime string                          `json:"start_time"`
@@ -833,11 +824,11 @@ type CancelBookingResponseObject interface {
 	VisitCancelBookingResponse(w http.ResponseWriter) error
 }
 
-type CancelBooking200JSONResponse MessageResponse
+type CancelBooking204JSONResponse interface{}
 
-func (response CancelBooking200JSONResponse) VisitCancelBookingResponse(w http.ResponseWriter) error {
+func (response CancelBooking204JSONResponse) VisitCancelBookingResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
+	w.WriteHeader(204)
 
 	return json.NewEncoder(w).Encode(response)
 }
