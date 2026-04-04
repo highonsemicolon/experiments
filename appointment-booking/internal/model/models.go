@@ -14,14 +14,14 @@ type Coach struct {
 }
 
 type Availability struct {
-    ID        uint   `gorm:"primaryKey;autoIncrement" json:"id"`
-    CoachID   uint   `gorm:"not null;index"           json:"coach_id"`
-    DayOfWeek string `gorm:"not null"                 json:"day_of_week"`
-    StartTime string `gorm:"not null"                 json:"start_time"`
-    EndTime   string `gorm:"not null"                 json:"end_time"`
-    Timezone  string `gorm:"not null;default:'UTC'"   json:"timezone"`
+    ID        uint   `gorm:"primaryKey;autoIncrement"                       json:"id"`
+    CoachID   uint   `gorm:"not null;uniqueIndex:uq_coach_day"              json:"coach_id"`
+    DayOfWeek string `gorm:"not null;uniqueIndex:uq_coach_day"              json:"day_of_week"`
+    StartTime string `gorm:"not null"                                       json:"start_time"`
+    EndTime   string `gorm:"not null"                                       json:"end_time"`
+    Timezone  string `gorm:"not null;default:'UTC'"                         json:"timezone"`
 
-    Coach Coach `gorm:"foreignKey:CoachID" json:"-"`
+    Coach     Coach  `gorm:"foreignKey:CoachID"                             json:"-"`
 }
 
 type Booking struct {
