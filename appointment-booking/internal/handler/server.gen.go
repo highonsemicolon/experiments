@@ -144,7 +144,7 @@ type SetAvailabilityRequest struct {
 type SetAvailabilityRequestDayOfWeek string
 
 // UserIdHeader defines model for UserIdHeader.
-type UserIdHeader = int
+type UserIdHeader = string
 
 // BadRequest defines model for BadRequest.
 type BadRequest = ErrorResponse
@@ -265,7 +265,7 @@ func (siw *ServerInterfaceWrapper) SetCoachAvailability(c *gin.Context) {
 			return
 		}
 
-		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
 		if err != nil {
 			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
 			return
@@ -307,7 +307,7 @@ func (siw *ServerInterfaceWrapper) RegisterCoach(c *gin.Context) {
 			return
 		}
 
-		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
 		if err != nil {
 			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
 			return
@@ -381,7 +381,7 @@ func (siw *ServerInterfaceWrapper) GetUserBookings(c *gin.Context) {
 			return
 		}
 
-		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
 		if err != nil {
 			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
 			return
@@ -423,7 +423,7 @@ func (siw *ServerInterfaceWrapper) CreateBooking(c *gin.Context) {
 			return
 		}
 
-		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
 		if err != nil {
 			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
 			return
@@ -474,7 +474,7 @@ func (siw *ServerInterfaceWrapper) CancelBooking(c *gin.Context) {
 			return
 		}
 
-		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "integer", Format: ""})
+		err = runtime.BindStyledParameterWithOptions("simple", "User-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
 		if err != nil {
 			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter User-ID: %w", err), http.StatusBadRequest)
 			return
