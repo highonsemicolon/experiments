@@ -190,9 +190,6 @@ paths:
       responses:
         '204':
           description: Booking cancelled successfully
-          content:
-            application/json:
-              schema:
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':

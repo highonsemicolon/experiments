@@ -824,13 +824,12 @@ type CancelBookingResponseObject interface {
 	VisitCancelBookingResponse(w http.ResponseWriter) error
 }
 
-type CancelBooking204JSONResponse interface{}
+type CancelBooking204Response struct {
+}
 
-func (response CancelBooking204JSONResponse) VisitCancelBookingResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response CancelBooking204Response) VisitCancelBookingResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
 type CancelBooking403JSONResponse struct{ ForbiddenJSONResponse }
