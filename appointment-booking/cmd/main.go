@@ -47,12 +47,12 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-	AllowOrigins:     []string{"*"},
-	AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-	AllowHeaders:     []string{"Origin", "Content-Type"},
-	ExposeHeaders:    []string{"Content-Length"},
-	AllowCredentials: true,
-	MaxAge:           12 * time.Hour,
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "User-ID"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
 }))
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
