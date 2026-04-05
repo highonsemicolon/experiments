@@ -1,5 +1,5 @@
 simply run it using `docker compose up`
-
+and visit http://localhost:8081/ to explore.
 
 OpenAPI Code gen:
 ```bash
