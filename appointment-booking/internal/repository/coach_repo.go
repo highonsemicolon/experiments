@@ -39,7 +39,7 @@ func (r *coachRepository) RegisterCoach(coach *model.Coach) error {
 
 func (r *coachRepository) GetByID(coachID string) (*model.Coach, error) {
 	var coach model.Coach
-	if err := r.db.First(&coach, coachID).Error; err != nil {
+	if err := r.db.First(&coach, "id = ?", coachID).Error; err != nil {
 		return nil, err
 	}
 	return &coach, nil
