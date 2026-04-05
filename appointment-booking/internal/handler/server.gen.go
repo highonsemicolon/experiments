@@ -78,7 +78,6 @@ type AvailabilityResponse struct {
 // AvailableSlotsResponse defines model for AvailableSlotsResponse.
 type AvailableSlotsResponse struct {
 	CoachId  *string      `json:"coach_id,omitempty"`
-	Date     *string      `json:"date,omitempty"`
 	Slots    *[]time.Time `json:"slots,omitempty"`
 	Timezone *string      `json:"timezone,omitempty"`
 }

@@ -130,10 +130,8 @@ func (h *Handler) GetAvailableSlots(ctx context.Context, request GetAvailableSlo
 	}
 
 	coachId := request.Params.CoachId
-	dateStr := date
 	return GetAvailableSlots200JSONResponse(AvailableSlotsResponse{
 		CoachId:  &coachId,
-		Date:     &dateStr,
 		Timezone: &tz,
 		Slots:    &slots,
 	}), nil

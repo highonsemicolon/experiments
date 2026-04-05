@@ -300,8 +300,6 @@ components:
       properties:
         coach_id:
           type: string
-        date:
-          type: string
         timezone:
           type: string
         slots:
