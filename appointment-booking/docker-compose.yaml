@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: yourpassword
-      MYSQL_DATABASE: appointment_booking
+      MYSQL_DATABASE: bookings
     ports:
       - "3306:3306"
     # volumes:
