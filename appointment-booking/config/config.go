@@ -3,12 +3,12 @@ package config
 import "fmt"
 
 type Config struct {
-	DBHost     string `koanf:"db.host" validate:"required"`
-	DBPort     string `koanf:"db.port" validate:"required"`
-	DBUser     string `koanf:"db.user" validate:"required"`
-	DBPassword string `koanf:"db.password" validate:"required"`
-	DBName     string `koanf:"db.name" validate:"required"`
-	ServerPort string `koanf:"server.port" validate:"required"`
+	DBHost     string `koanf:"db_host" validate:"required"`
+	DBPort     string `koanf:"db_port" validate:"required"`
+	DBUser     string `koanf:"db_user" validate:"required"`
+	DBPassword string `koanf:"db_password" validate:"required"`
+	DBName     string `koanf:"db_name" validate:"required"`
+	ServerPort string `koanf:"server_port" validate:"required"`
 }
 
 func (c *Config) DSN() string {
