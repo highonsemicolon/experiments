@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/highonsemicolon/experiments/appointment-booking/config"
 	"github.com/highonsemicolon/experiments/appointment-booking/database"
@@ -45,12 +46,21 @@ func main() {
 	h := handler.NewHandler(coachSvc, bookingSvc)
 
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+	AllowOrigins:     []string{"*"},
+	AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+	AllowHeaders:     []string{"Origin", "Content-Type"},
+	ExposeHeaders:    []string{"Content-Length"},
+	AllowCredentials: true,
+	MaxAge:           12 * time.Hour,
+}))
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	handler.RegisterHandlers(r, handler.NewStrictHandler(h, nil))
+	base := r.Group("/api/v1")
+	handler.RegisterHandlers(base, handler.NewStrictHandler(h, nil))
 
-	r.GET("/health", func(c *gin.Context) {
+	base.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
