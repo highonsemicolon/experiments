@@ -12,7 +12,7 @@ builder.Services.AddGrpcReflection();
 
 builder.WebHost.ConfigureKestrel(options => {
     options.ConfigureEndpointDefaults(o => {
-        o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+        o.Protocols = HttpProtocols.Http2;
     });
 });
 
