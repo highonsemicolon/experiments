@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\packages\logging\Logging.csproj" />
+    <ProjectReference Include="..\..\packages\platform\Platform.csproj" />
   </ItemGroup>
 
 </Project>

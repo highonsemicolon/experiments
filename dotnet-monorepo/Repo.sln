@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Greeter.Service", "services
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "packages", "{4720F58B-BB58-46B8-A33F-3D476F2BC50B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "packages\logging\Logging.csproj", "{25E4E047-6FAA-4457-A7DC-78B177EF8671}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform", "packages\platform\Platform.csproj", "{25E4E047-6FAA-4457-A7DC-78B177EF8671}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

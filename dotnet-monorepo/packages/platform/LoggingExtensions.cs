@@ -4,7 +4,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 
-namespace Logging;
+namespace Platform.Logging;
 
 public static class LoggingExtensions
 {

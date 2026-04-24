@@ -1,5 +1,5 @@
 using Handler;
-using Logging;
+using Platform.Logging;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
