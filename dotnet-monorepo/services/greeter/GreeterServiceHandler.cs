@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Greeter.V1;
+using Greeter.Service.Logging;
 
 namespace Handler;
 
@@ -13,20 +14,14 @@ public class GreeterServiceHandler : GreeterService.GreeterServiceBase
         SayHelloRequest request,
         ServerCallContext context)
     {
-        _logger.LogInformation(
-            "Received greeting request for {Name} from {Peer}",
-            request.Name,
-            context.Peer);
 
+        GreeterLogs.GreetingReceived(_logger, request.Name, context.Peer);
         var response = new SayHelloResponse
         {
             Message = $"Hello, {request.Name}!"
         };
 
-        _logger.LogInformation(
-            "Sending greeting response for {Name} to {Peer}",
-            request.Name,
-            context.Peer);
+        GreeterLogs.GreetingSent(_logger, request.Name);
 
         return Task.FromResult(response);
     }
