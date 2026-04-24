@@ -1,7 +1,9 @@
 using Handler;
+using Logging;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformLogging();
 
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();

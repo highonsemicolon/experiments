@@ -4,7 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Greeter.Service", "services\greeter\Greeter.Service.csproj", "{91851A1A-CE91-4740-9BAE-AD9A2A50D725}"
-EndProject	
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "packages", "{4720F58B-BB58-46B8-A33F-3D476F2BC50B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "packages\logging\Logging.csproj", "{25E4E047-6FAA-4457-A7DC-78B177EF8671}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,12 @@ Global
 		{91851A1A-CE91-4740-9BAE-AD9A2A50D725}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91851A1A-CE91-4740-9BAE-AD9A2A50D725}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91851A1A-CE91-4740-9BAE-AD9A2A50D725}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25E4E047-6FAA-4457-A7DC-78B177EF8671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25E4E047-6FAA-4457-A7DC-78B177EF8671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25E4E047-6FAA-4457-A7DC-78B177EF8671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25E4E047-6FAA-4457-A7DC-78B177EF8671}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{25E4E047-6FAA-4457-A7DC-78B177EF8671} = {4720F58B-BB58-46B8-A33F-3D476F2BC50B}
 	EndGlobalSection
 EndGlobal

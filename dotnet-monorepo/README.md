@@ -20,6 +20,7 @@ docs/       -> docs
 # Minimal templates
 
 dotnet new classlib -n Logging -o packages/logging
+dotnet sln add packages/logging/Logging.csproj
 
 dotnet new web -n Greeter.Service -o services/greeter
 

@@ -17,4 +17,8 @@
     <Protobuf Include="..\..\apis\greeter\v1\greeter.proto" GrpcServices="Server" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\packages\logging\Logging.csproj" />
+  </ItemGroup>
+
 </Project>
