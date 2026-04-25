@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Resources;
@@ -14,9 +15,10 @@ public static class TelemetryExtensions
         services.AddOpenTelemetry()
             .ConfigureResource(resource =>
             {
+                var version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
                 resource.AddService(
                     serviceName: env.ApplicationName,
-                    serviceVersion: "1.0.0",
+                    serviceVersion: version,
                     serviceInstanceId: Environment.MachineName);
             })
             .WithTracing(tracing =>
@@ -24,8 +26,7 @@ public static class TelemetryExtensions
                 tracing
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .SetSampler(new AlwaysOnSampler())
-                    .AddOtlpExporter(); // later overridden in GKE
+                    .AddOtlpExporter(); // configured via environment variables (e.g., in GKE)
             });
 
         return services;
