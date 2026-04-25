@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 
 using Serilog;
 using Serilog.Events;
-using Serilog.Formatting.Compact;
 
 namespace Platform.Logging;
 
@@ -11,6 +10,7 @@ public static class LoggingExtensions {
     public static WebApplicationBuilder AddPlatformLogging(
         this WebApplicationBuilder builder) {
         var env = builder.Environment;
+        var projectId = builder.Configuration["GCP_PROJECT_ID"] ?? "local";
 
         var logger = new LoggerConfiguration()
             // Base level
@@ -48,7 +48,7 @@ public static class LoggingExtensions {
         }
         else {
             // GKE / Cloud Logging friendly JSON
-            logger = logger.WriteTo.Console(new RenderedCompactJsonFormatter());
+            logger = logger.WriteTo.Console(new GcpJsonFormatter(projectId));
         }
 
         Log.Logger = logger.CreateLogger();

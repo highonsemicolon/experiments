@@ -2,10 +2,10 @@ using Handler;
 
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
-using Platform.Hosting;
+using Platform.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddPlatformHost();
+builder.AddPlatformObservability();
 
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
