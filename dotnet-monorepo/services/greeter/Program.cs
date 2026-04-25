@@ -1,11 +1,9 @@
 using Handler;
-using Platform.Logging;
-using Platform.Telemetry;
+using Platform.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddPlatformLogging();
-builder.AddPlatformTelemetry();
+builder.AddPlatformHost();
 
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();

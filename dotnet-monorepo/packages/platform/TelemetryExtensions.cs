@@ -1,31 +1,33 @@
-using Microsoft.AspNetCore.Builder;
-using OpenTelemetry.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Instrumentation.Http; 
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Platform.Telemetry;
 
 public static class TelemetryExtensions
 {
-    public static WebApplicationBuilder AddPlatformTelemetry(
-        this WebApplicationBuilder builder)
+    public static IServiceCollection AddPlatformTelemetry(
+        this IServiceCollection services,
+        IHostEnvironment env)
     {
-        var serviceName = builder.Environment.ApplicationName;
-
-        builder.Services.AddOpenTelemetry()
+        services.AddOpenTelemetry()
+            .ConfigureResource(resource =>
+            {
+                resource.AddService(
+                    serviceName: env.ApplicationName,
+                    serviceVersion: "1.0.0",
+                    serviceInstanceId: Environment.MachineName);
+            })
             .WithTracing(tracing =>
             {
                 tracing
-                    .SetResourceBuilder(
-                        ResourceBuilder.CreateDefault()
-                            .AddService(serviceName))
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddOtlpExporter();
+                    .SetSampler(new AlwaysOnSampler())
+                    .AddOtlpExporter(); // later overridden in GKE
             });
 
-        return builder;
+        return services;
     }
 }
