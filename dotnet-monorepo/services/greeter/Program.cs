@@ -1,6 +1,8 @@
 using Handler;
-using Platform.Hosting;
+
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+
+using Platform.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddPlatformHost();

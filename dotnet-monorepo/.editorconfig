@@ -8,4 +8,33 @@ end_of_line = lf
 insert_final_newline = true
 
 [*.cs]
+
+# Inline braces for single line
 csharp_new_line_before_open_brace = none
+
+
+# Order of using directives
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+# Indentation & spacing
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+
+# Object/collection initialization
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+
+# Null handling improvements
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+
+# Remove unused usings automatically
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+# Require accessibility modifiers (avoids ambiguity)
+dotnet_style_require_accessibility_modifiers = always:suggestion
+
+# Prefer readonly fields where possible
+dotnet_style_readonly_field = true:suggestion

@@ -1,6 +1,7 @@
-using Grpc.Core;
-using Greeter.V1;
 using Greeter.Service.Logging;
+using Greeter.V1;
+
+using Grpc.Core;
 
 namespace Handler;
 
