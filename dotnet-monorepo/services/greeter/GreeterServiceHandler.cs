@@ -4,20 +4,17 @@ using Greeter.Service.Logging;
 
 namespace Handler;
 
-public class GreeterServiceHandler : GreeterService.GreeterServiceBase
-{
+public class GreeterServiceHandler : GreeterService.GreeterServiceBase {
     private readonly ILogger<GreeterServiceHandler> _logger;
     public GreeterServiceHandler(ILogger<GreeterServiceHandler> logger) {
         _logger = logger;
     }
     public override Task<SayHelloResponse> SayHello(
         SayHelloRequest request,
-        ServerCallContext context)
-    {
+        ServerCallContext context) {
 
         GreeterLogs.GreetingReceived(_logger, request.Name, context.Peer);
-        var response = new SayHelloResponse
-        {
+        var response = new SayHelloResponse {
             Message = $"Hello, {request.Name}!"
         };
 

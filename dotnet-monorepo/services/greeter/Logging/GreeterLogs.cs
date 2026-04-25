@@ -2,8 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Greeter.Service.Logging;
 
-internal static partial class GreeterLogs
-{
+internal static partial class GreeterLogs {
     [LoggerMessage(
         EventId = 1001,
         Level = LogLevel.Information,

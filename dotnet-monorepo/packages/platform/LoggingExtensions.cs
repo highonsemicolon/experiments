@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -6,11 +6,9 @@ using Serilog.Formatting.Compact;
 
 namespace Platform.Logging;
 
-public static class LoggingExtensions
-{
+public static class LoggingExtensions {
     public static WebApplicationBuilder AddPlatformLogging(
-        this WebApplicationBuilder builder)
-    {
+        this WebApplicationBuilder builder) {
         var env = builder.Environment;
 
         var logger = new LoggerConfiguration()
@@ -40,16 +38,14 @@ public static class LoggingExtensions
             .Enrich.WithProperty("service", env.ApplicationName)
             .Enrich.WithProperty("environment", env.EnvironmentName);
 
-        if (env.IsDevelopment())
-        {
+        if (env.IsDevelopment()) {
             // Human-friendly local logs
             logger = logger.WriteTo.Console(
                 outputTemplate:
                 "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} " +
                 "(trace:{TraceId} span:{SpanId}){NewLine}{Exception}");
         }
-        else
-        {
+        else {
             // GKE / Cloud Logging friendly JSON
             logger = logger.WriteTo.Console(new RenderedCompactJsonFormatter());
         }

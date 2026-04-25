@@ -6,23 +6,19 @@ using OpenTelemetry.Trace;
 
 namespace Platform.Telemetry;
 
-public static class TelemetryExtensions
-{
+public static class TelemetryExtensions {
     public static IServiceCollection AddPlatformTelemetry(
         this IServiceCollection services,
-        IHostEnvironment env)
-    {
+        IHostEnvironment env) {
         services.AddOpenTelemetry()
-            .ConfigureResource(resource =>
-            {
+            .ConfigureResource(resource => {
                 var version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
                 resource.AddService(
                     serviceName: env.ApplicationName,
                     serviceVersion: version,
                     serviceInstanceId: Environment.MachineName);
             })
-            .WithTracing(tracing =>
-            {
+            .WithTracing(tracing => {
                 tracing
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
