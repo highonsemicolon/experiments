@@ -25,3 +25,6 @@ dotnet sln add packages/logging/Logging.csproj
 dotnet new web -n Greeter.Service -o services/greeter
 
 dotnet new xunit -n Greeter.Tests -o tests/greeter
+
+
+docker compose --profile infra up
