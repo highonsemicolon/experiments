@@ -1,0 +1,20 @@
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-config.yaml"]
+    volumes:
+      - ./otel-config.yaml:/etc/otel-config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC
+    depends_on:
+      - jaeger
+    profiles: 
+      - "infra"
+
+  jaeger:
+    image: jaegertracing/jaeger:latest
+    ports:
+      - "16686:16686" # UI
+    profiles: 
+      - "infra"
+
