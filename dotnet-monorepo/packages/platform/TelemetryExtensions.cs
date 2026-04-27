@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -6,12 +7,17 @@ using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
+using OpenTelemetry.Exporter;
+
 namespace Platform.Telemetry;
 
 public static class TelemetryExtensions {
     public static IServiceCollection AddPlatformTelemetry(
         this IServiceCollection services,
         IHostEnvironment env) {
+
+        services.AddSingleton<IActivitySourceFactory, ActivitySourceFactory>();
+
         services.AddOpenTelemetry()
             .ConfigureResource(resource => {
                 var version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
@@ -22,11 +28,52 @@ public static class TelemetryExtensions {
             })
             .WithTracing(tracing => {
                 tracing
+                    .AddSource(env.ApplicationName)
+                    .AddSource("Grpc.Net.Client") 
                     .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
+                    .AddHttpClientInstrumentation(opts => {
+            opts.FilterHttpRequestMessage = _ => true;
+        })
+                    .AddConsoleExporter()
                     .AddOtlpExporter(); // configured via environment variables (e.g., in GKE)
             });
 
         return services;
     }
+}
+
+
+
+public interface IActivitySourceFactory
+{
+    ActivitySource Create<T>();
+}
+
+// public class ActivitySourceFactory : IActivitySourceFactory
+// {
+//     private readonly string _serviceName;
+
+//     public ActivitySourceFactory(IHostEnvironment env)
+//     {
+//         _serviceName = env.ApplicationName;
+//     }
+
+//     public ActivitySource Create<T>()
+//     {
+//         var name = $"{_serviceName}.{typeof(T).Name}";
+//         return new ActivitySource(name);
+//     }
+// }
+
+
+public class ActivitySourceFactory : IActivitySourceFactory
+{
+    private readonly ActivitySource _source;
+
+    public ActivitySourceFactory(IHostEnvironment env)
+    {
+        _source = new ActivitySource(env.ApplicationName);
+    }
+
+    public ActivitySource Create<T>() => _source;
 }

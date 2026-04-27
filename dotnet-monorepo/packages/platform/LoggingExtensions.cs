@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
@@ -9,52 +10,54 @@ namespace Platform.Logging;
 public static class LoggingExtensions {
     public static WebApplicationBuilder AddPlatformLogging(
         this WebApplicationBuilder builder) {
-        var env = builder.Environment;
-        var projectId = builder.Configuration["GCP_PROJECT_ID"] ?? "local";
+        var logger = BuildLogger(
+            builder.Environment,
+            builder.Configuration);
+
+        Log.Logger = logger;
+
+        builder.Host.UseSerilog();
+
+        return builder;
+    }
+
+    public static HostApplicationBuilder AddPlatformLogging(
+        this HostApplicationBuilder builder) {
+        var logger = BuildLogger(
+            builder.Environment,
+            builder.Configuration);
+
+        Log.Logger = logger;
+
+        builder.Services.AddSerilog(logger);
+
+        return builder;
+    }
+
+    private static ILogger BuildLogger(
+        IHostEnvironment env,
+        IConfiguration config) {
+        var projectId = config["GCP_PROJECT_ID"] ?? "local";
 
         var logger = new LoggerConfiguration()
-            // Base level
             .MinimumLevel.Information()
-
-            // Framework noise control
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Warning)
-
-            // ASP.NET request pipeline noise
-            .MinimumLevel.Override(
-                "Microsoft.AspNetCore.Hosting.Diagnostics",
-                LogEventLevel.Warning)
-
-            .MinimumLevel.Override(
-                "Microsoft.AspNetCore.Routing.EndpointMiddleware",
-                LogEventLevel.Warning)
-
-            // gRPC reflection / internal probe noise
-            .MinimumLevel.Override(
-                "Grpc.AspNetCore.Server.Internal.ServerCallHandlerFactory",
-                LogEventLevel.Warning)
-
-            // Structured enrichment
             .Enrich.FromLogContext()
             .Enrich.WithProperty("service", env.ApplicationName)
             .Enrich.WithProperty("environment", env.EnvironmentName);
 
         if (env.IsDevelopment()) {
-            // Human-friendly local logs
             logger = logger.WriteTo.Console(
                 outputTemplate:
                 "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} " +
                 "(trace:{TraceId} span:{SpanId}){NewLine}{Exception}");
         }
         else {
-            // GKE / Cloud Logging friendly JSON
-            logger = logger.WriteTo.Console(new GcpJsonFormatter(projectId));
+            logger = logger.WriteTo.Console(
+                new GcpJsonFormatter(projectId));
         }
 
-        Log.Logger = logger.CreateLogger();
-
-        builder.Host.UseSerilog();
-
-        return builder;
+        return logger.CreateLogger();
     }
 }
