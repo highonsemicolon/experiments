@@ -1,13 +1,12 @@
-using System.Reflection;
 using System.Diagnostics;
+using System.Reflection;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-
-using OpenTelemetry.Exporter;
 
 namespace Platform.Telemetry;
 
@@ -29,11 +28,11 @@ public static class TelemetryExtensions {
             .WithTracing(tracing => {
                 tracing
                     .AddSource(env.ApplicationName)
-                    .AddSource("Grpc.Net.Client") 
+                    .AddSource("Grpc.Net.Client")
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation(opts => {
-            opts.FilterHttpRequestMessage = _ => true;
-        })
+                        opts.FilterHttpRequestMessage = _ => true;
+                    })
                     .AddConsoleExporter()
                     .AddOtlpExporter(); // configured via environment variables (e.g., in GKE)
             });
@@ -44,8 +43,7 @@ public static class TelemetryExtensions {
 
 
 
-public interface IActivitySourceFactory
-{
+public interface IActivitySourceFactory {
     ActivitySource Create<T>();
 }
 
@@ -66,12 +64,10 @@ public interface IActivitySourceFactory
 // }
 
 
-public class ActivitySourceFactory : IActivitySourceFactory
-{
+public class ActivitySourceFactory : IActivitySourceFactory {
     private readonly ActivitySource _source;
 
-    public ActivitySourceFactory(IHostEnvironment env)
-    {
+    public ActivitySourceFactory(IHostEnvironment env) {
         _source = new ActivitySource(env.ApplicationName);
     }
 
