@@ -45,23 +45,6 @@ public interface IActivitySourceFactory {
     ActivitySource Create<T>();
 }
 
-// public class ActivitySourceFactory : IActivitySourceFactory
-// {
-//     private readonly string _serviceName;
-
-//     public ActivitySourceFactory(IHostEnvironment env)
-//     {
-//         _serviceName = env.ApplicationName;
-//     }
-
-//     public ActivitySource Create<T>()
-//     {
-//         var name = $"{_serviceName}.{typeof(T).Name}";
-//         return new ActivitySource(name);
-//     }
-// }
-
-
 public class ActivitySourceFactory : IActivitySourceFactory {
     private readonly ActivitySource _source;
 
