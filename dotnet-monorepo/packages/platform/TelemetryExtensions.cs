@@ -4,7 +4,6 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -33,7 +32,6 @@ public static class TelemetryExtensions {
                     .AddHttpClientInstrumentation(opts => {
                         opts.FilterHttpRequestMessage = _ => true;
                     })
-                    .AddConsoleExporter()
                     .AddOtlpExporter(); // configured via environment variables (e.g., in GKE)
             });
 
