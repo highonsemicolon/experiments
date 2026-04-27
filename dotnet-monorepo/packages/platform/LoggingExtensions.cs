@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
+using Serilog.Enrichers.Span;
 using Serilog.Events;
 
 namespace Platform.Logging;
@@ -44,6 +45,7 @@ public static class LoggingExtensions {
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Warning)
             .Enrich.FromLogContext()
+            .Enrich.WithSpan()
             .Enrich.WithProperty("service", env.ApplicationName)
             .Enrich.WithProperty("environment", env.EnvironmentName);
 
