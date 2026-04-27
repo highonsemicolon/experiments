@@ -12,7 +12,7 @@ namespace Platform.Telemetry;
 public static class TelemetryExtensions {
     public static IServiceCollection AddPlatformTelemetry(
         this IServiceCollection services,
-        IHostEnvironment env) {
+        IHostEnvironment env, params string[] activitySources) {
 
         services.AddSingleton<IActivitySourceFactory, ActivitySourceFactory>();
 
@@ -27,12 +27,13 @@ public static class TelemetryExtensions {
             .WithTracing(tracing => {
                 tracing
                     .AddSource(env.ApplicationName)
-                    .AddSource("Grpc.Net.Client")
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation(opts => {
                         opts.FilterHttpRequestMessage = _ => true;
                     })
                     .AddOtlpExporter(); // configured via environment variables (e.g., in GKE)
+                foreach (var source in activitySources.Distinct())
+                    tracing.AddSource(source);
             });
 
         return services;

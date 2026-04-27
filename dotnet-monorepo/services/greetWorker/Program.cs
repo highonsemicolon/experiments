@@ -6,7 +6,7 @@ using Platform.Observability;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.AddPlatformObservability();
+builder.AddPlatformObservability("Grpc.Net.Client");
 
 builder.Services.AddGrpcClient<GreeterService.GreeterServiceClient>(options => {
     options.Address = new Uri("http://localhost:8080");
