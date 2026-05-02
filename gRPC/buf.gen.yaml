@@ -1,16 +1,16 @@
-version: v1
+version: v2
 plugins:
-  - plugin: go
+  - local: protoc-gen-go
     out: server/proto
-    opt: 
-    - paths=source_relative
-    - Mgreeter.proto=github.com/highonsemicolon/experiments/grpc/proto;proto
-
-  - plugin: go-grpc
+    opt:
+      - paths=source_relative
+      - Mgreeter.proto=github.com/highonsemicolon/experiments/grpc/proto;proto
+  
+  - local: protoc-gen-go-grpc
     out: server/proto
-    opt: 
-    - paths=source_relative
-    - Mgreeter.proto=github.com/highonsemicolon/experiments/grpc/proto;proto
-
-  - plugin: buf.build/community/timostamm-protobuf-ts
+    opt:
+      - paths=source_relative
+      - Mgreeter.proto=github.com/highonsemicolon/experiments/grpc/proto;proto
+  
+  - remote: buf.build/community/timostamm-protobuf-ts
     out: client/src/proto
