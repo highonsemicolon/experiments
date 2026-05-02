@@ -1,4 +1,29 @@
 services:
+
+  greeter:
+    build:
+      context: .
+      dockerfile: services/greeter/Dockerfile
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    ports:
+      - "8080:8080"
+    depends_on:
+      - otel-collector
+    profiles: 
+      - services
+
+  greet-worker:
+    build:
+      context: .
+      dockerfile: services/greetWorker/Dockerfile
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    depends_on:
+      - greeter
+    profiles: 
+      - services
+
   otel-collector:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/otel-config.yaml"]
@@ -9,12 +34,12 @@ services:
     depends_on:
       - jaeger
     profiles: 
-      - "infra"
+      - infra
 
   jaeger:
     image: jaegertracing/jaeger:latest
     ports:
       - "16686:16686" # UI
     profiles: 
-      - "infra"
+      - infra
 
