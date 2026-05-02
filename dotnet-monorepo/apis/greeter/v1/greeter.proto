@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package greeter.v1;
 
-option csharp_namespace = "Greeter.V1";
-
 service GreeterService {
   rpc SayHello (SayHelloRequest) returns (SayHelloResponse);
 }
