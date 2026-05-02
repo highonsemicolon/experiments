@@ -1,12 +1,12 @@
 version: v2
 plugins:
-  - local: protoc-gen-go
+  - remote: buf.build/protocolbuffers/go
     out: server/proto
     opt:
       - paths=source_relative
       - Mgreeter.proto=github.com/highonsemicolon/experiments/grpc/proto;proto
   
-  - local: protoc-gen-go-grpc
+  - remote: buf.build/grpc/go
     out: server/proto
     opt:
       - paths=source_relative
