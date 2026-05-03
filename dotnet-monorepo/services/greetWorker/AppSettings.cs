@@ -1,4 +1,3 @@
-
 public sealed class AppSettings {
     public GreeterSettings Greeter { get; init; } = new();
     public ObservabilitySettings Observability { get; init; } = new();
