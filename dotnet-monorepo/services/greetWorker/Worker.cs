@@ -1,6 +1,8 @@
 using System.Diagnostics;
-using Microsoft.Extensions.Options;
+
 using Greeter.V1;
+
+using Microsoft.Extensions.Options;
 
 using Platform.Telemetry;
 
@@ -13,7 +15,7 @@ public class Worker : BackgroundService {
     private readonly AppSettings _settings;
 
 
-    public Worker(ILogger<Worker> logger, IOptions<AppSettings>options, GreeterService.GreeterServiceClient greeterClient, IActivitySourceFactory factory) {
+    public Worker(ILogger<Worker> logger, IOptions<AppSettings> options, GreeterService.GreeterServiceClient greeterClient, IActivitySourceFactory factory) {
         _logger = logger;
         _greeterClient = greeterClient;
         _activitySource = factory.Create<Worker>();
@@ -22,7 +24,7 @@ public class Worker : BackgroundService {
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         _logger.LogInformation("Greeter URL: {Url}", _settings.Greeter.Url);
-        
+
         while (!stoppingToken.IsCancellationRequested) {
             using var activity = _activitySource.StartActivity("message-loop", ActivityKind.Consumer);
             await SendGreeting(stoppingToken);
