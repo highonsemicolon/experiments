@@ -2,14 +2,21 @@ using Greet.Worker;
 
 using Greeter.V1;
 
+using Microsoft.Extensions.Options;
+
 using Platform.Observability;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.AddPlatformObservability("Grpc.Net.Client");
+builder.Services.AddOptions<AppSettings>().Bind(builder.Configuration).ValidateOnStart();
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<AppSettings>>().Value);
 
-builder.Services.AddGrpcClient<GreeterService.GreeterServiceClient>(options => {
-    options.Address = new Uri("http://localhost:8080");
+var appSettings = builder.Configuration.Get<AppSettings>()!;
+builder.AddPlatformObservability(appSettings.Observability.ActivitySources);
+
+builder.Services.AddGrpcClient<GreeterService.GreeterServiceClient>((sp, options) => {
+    var settings = sp.GetRequiredService<AppSettings>();
+    options.Address = settings.Greeter.Url;
 });
 
 builder.Services.AddHostedService<Worker>();

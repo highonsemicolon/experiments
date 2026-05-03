@@ -19,6 +19,7 @@ services:
       dockerfile: services/greetWorker/Dockerfile
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - Greeter__Url=http://greeter:8080
     depends_on:
       - greeter
     profiles: 
