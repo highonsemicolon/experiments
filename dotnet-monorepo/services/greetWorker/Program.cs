@@ -11,11 +11,10 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddOptions<AppSettings>().Bind(builder.Configuration).ValidateOnStart();
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<AppSettings>>().Value);
 
-var appSettings = builder.Configuration.Get<AppSettings>()!;
-builder.AddPlatformObservability(appSettings.Observability.ActivitySources);
+var settings = builder.Configuration.Get<AppSettings>()!;
+builder.AddPlatformObservability(settings.Observability.ActivitySources);
 
-builder.Services.AddGrpcClient<GreeterService.GreeterServiceClient>((sp, options) => {
-    var settings = sp.GetRequiredService<AppSettings>();
+builder.Services.AddGrpcClient<GreeterService.GreeterServiceClient>((options) => {
     options.Address = settings.Greeter.Url;
 });
 
