@@ -19,6 +19,7 @@ builder.Services.AddGrpcClient<GreeterService.GreeterServiceClient>((sp, options
     options.Address = settings.Greeter.Url;
 });
 
+builder.Services.AddScoped<IMessageProcessor, MessageProcessor>();
 builder.Services.AddHostedService<Worker>();
 
 var host = builder.Build();
