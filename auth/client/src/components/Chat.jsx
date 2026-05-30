@@ -4,11 +4,12 @@ import { useApi } from '../utils/api'
 const Chat = () => {
     const { callApi } = useApi()
     const [messages, setMessages] = useState([])
+    const BASE_URI = import.meta.env.VITE_BASE_URI
 
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const data = await callApi('http://localhost:8081/protected-endpoint')
+                const data = await callApi(`${BASE_URI}/protected-endpoint`)
                 setMessages(data)
             } catch (error) {
                 console.error(error)

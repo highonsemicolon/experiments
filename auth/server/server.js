@@ -1,19 +1,26 @@
+require('dotenv').config()
 const express = require('express')
 const { auth } = require('express-oauth2-jwt-bearer')
 const cors = require('cors')
 
-const port = process.env.PORT || 8081
+const {
+  PORT = 8081,
+  CORS_ORIGIN = 'http://localhost:8080',
+  AUTH_AUDIENCE,
+  AUTH_ISSUER_BASE_URL,
+  AUTH_TOKEN_SIGNING_ALG = 'RS256',
+} = process.env
 
 const jwtCheck = auth({
-  audience: 'pathfinder-backend',
-  issuerBaseURL: 'https://pathfinder-1.us.auth0.com/',
-  tokenSigningAlg: 'RS256',
+  audience: AUTH_AUDIENCE,
+  issuerBaseURL: AUTH_ISSUER_BASE_URL,
+  tokenSigningAlg: AUTH_TOKEN_SIGNING_ALG,
 })
 
 const app = express()
 
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: CORS_ORIGIN,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -30,7 +37,7 @@ app.get('/protected-endpoint', jwtCheck, (req, res) => {
   ])
 })
 
-app.listen(port)
+app.listen(PORT)
 
-console.log('Running on port ', port);
+console.log(`Running on port ${PORT}`);
 
