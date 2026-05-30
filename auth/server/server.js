@@ -23,14 +23,11 @@ app.get('/', function (req, res) {
   res.send('welcome')
 })
 
-app.get('/authorized', jwtCheck, function (req, res) {
-  res.json({
-    msg: 'you are in',
-    userId: req.auth.payload.sub,
-    audience: req.auth.payload.aud,
-    issuer: req.auth.payload.iss,
-    scope: req.auth.payload.scope,
-  })
+app.get('/protected-endpoint', jwtCheck, (req, res) => {
+  res.json([
+    { id: 1, text: 'Hello' },
+    { id: 2, text: 'Welcome' }
+  ])
 })
 
 app.listen(port)
