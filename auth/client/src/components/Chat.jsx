@@ -15,7 +15,7 @@ const Chat = () => {
             }
         }
         fetchMessages()
-    }, [callApi])
+    }, [])
 
     return (
         <div>
